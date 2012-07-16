@@ -1,0 +1,385 @@
+Archive member included because of file (symbol)
+
+C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_copy_data.o)
+                              snake.o (__do_copy_data)
+C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_clear_bss.o)
+                              snake.o (__do_clear_bss)
+C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+                              snake.o (rand)
+C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_mulsi3.o)
+                              C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o) (__mulsi3)
+C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_udivmodsi4.o)
+                              C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o) (__udivmodsi4)
+C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_prologue.o)
+                              C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o) (__prologue_saves__)
+C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_epilogue.o)
+                              C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o) (__epilogue_restores__)
+
+Allocating common symbols
+Common symbol       size              file
+
+curDir              0x1               snake.o
+ledsDisplay         0x8               snake.o
+SNAKE               0x10              snake.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+text             0x00000000         0x00002000         xr
+data             0x00800060         0x0000ffa0         rw !x
+eeprom           0x00810000         0x00010000         rw !x
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+LOAD snake.o
+LOAD C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libm.a
+LOAD C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a
+LOAD C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a
+LOAD C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a
+
+.hash
+ *(.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.init
+ *(.rel.init)
+
+.rela.init
+ *(.rela.init)
+
+.rel.text
+ *(.rel.text)
+ *(.rel.text.*)
+ *(.rel.gnu.linkonce.t*)
+
+.rela.text
+ *(.rela.text)
+ *(.rela.text.*)
+ *(.rela.gnu.linkonce.t*)
+
+.rel.fini
+ *(.rel.fini)
+
+.rela.fini
+ *(.rela.fini)
+
+.rel.rodata
+ *(.rel.rodata)
+ *(.rel.rodata.*)
+ *(.rel.gnu.linkonce.r*)
+
+.rela.rodata
+ *(.rela.rodata)
+ *(.rela.rodata.*)
+ *(.rela.gnu.linkonce.r*)
+
+.rel.data
+ *(.rel.data)
+ *(.rel.data.*)
+ *(.rel.gnu.linkonce.d*)
+
+.rela.data
+ *(.rela.data)
+ *(.rela.data.*)
+ *(.rela.gnu.linkonce.d*)
+
+.rel.ctors
+ *(.rel.ctors)
+
+.rela.ctors
+ *(.rela.ctors)
+
+.rel.dtors
+ *(.rel.dtors)
+
+.rela.dtors
+ *(.rela.dtors)
+
+.rel.got
+ *(.rel.got)
+
+.rela.got
+ *(.rela.got)
+
+.rel.bss
+ *(.rel.bss)
+
+.rela.bss
+ *(.rela.bss)
+
+.rel.plt
+ *(.rel.plt)
+
+.rela.plt
+ *(.rela.plt)
+
+.text           0x00000000      0x6ae
+ *(.vectors)
+ .vectors       0x00000000       0x1a C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+                0x00000000                __vectors
+                0x00000000                __vector_default
+                0x0000001a                __ctors_start = .
+ *(.ctors)
+                0x0000001a                __ctors_end = .
+                0x0000001a                __dtors_start = .
+ *(.dtors)
+                0x0000001a                __dtors_end = .
+ *(.progmem.gcc*)
+ *(.progmem*)
+                0x0000001a                . = ALIGN (0x2)
+ *(.init0)
+ *(.init1)
+ *(.init2)
+ .init2         0x0000001a        0xc C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+ *(.init3)
+ *(.init4)
+ .init4         0x00000026       0x18 C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_copy_data.o)
+                0x00000026                __do_copy_data
+ .init4         0x0000003e       0x10 C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_clear_bss.o)
+                0x0000003e                __do_clear_bss
+ *(.init5)
+ *(.init6)
+ *(.init7)
+ *(.init8)
+ *(.init9)
+ .init9         0x0000004e        0x2 C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+ *(.text)
+ .text          0x00000050        0x2 C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+                0x00000050                __vector_1
+                0x00000050                __vector_12
+                0x00000050                __bad_interrupt
+                0x00000050                __vector_6
+                0x00000050                __vector_3
+                0x00000050                __vector_11
+                0x00000050                __vector_7
+                0x00000050                __vector_5
+                0x00000050                __vector_4
+                0x00000050                __vector_9
+                0x00000050                __vector_2
+                0x00000050                __vector_8
+                0x00000050                __vector_10
+ .text          0x00000052      0x490 snake.o
+                0x00000290                matchStar
+                0x000000b0                eatSnake
+                0x00000184                drawSnake
+                0x000001f2                posStar
+                0x000002d2                snakeStrike
+                0x000004be                checkforinput
+                0x000003ee                gameover
+                0x000000a4                decodedelay
+                0x00000432                main
+                0x00000334                checkMaxSnakeLen
+                0x00000052                delay
+                0x00000198                checkLocation
+                0x0000010a                addSnake
+ .text          0x000004e2       0xd8 C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+                0x00000598                rand_r
+                0x0000059c                rand
+                0x000005a4                srand
+                0x000005ba                . = ALIGN (0x2)
+ *(.text.*)
+ .text.libgcc   0x000005ba       0x36 C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_mulsi3.o)
+                0x000005ba                __mulsi3
+ .text.libgcc   0x000005f0       0x4e C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_udivmodsi4.o)
+                0x000005f0                __udivmodsi4
+ .text.libgcc   0x0000063e       0x38 C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_prologue.o)
+                0x0000063e                __prologue_saves__
+ .text.libgcc   0x00000676       0x38 C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_epilogue.o)
+                0x00000676                __epilogue_restores__
+                0x000006ae                . = ALIGN (0x2)
+ *(.fini9)
+ *(.fini8)
+ *(.fini7)
+ *(.fini6)
+ *(.fini5)
+ *(.fini4)
+ *(.fini3)
+ *(.fini2)
+ *(.fini1)
+ *(.fini0)
+                0x000006ae                _etext = .
+
+.data           0x00800060        0x6 load address 0x000006ae
+                0x00800060                PROVIDE (__data_start, .)
+ *(.data)
+ .data          0x00800060        0x2 snake.o
+                0x00800061                tail
+                0x00800060                head
+ .data          0x00800062        0x4 C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+ *(.gnu.linkonce.d*)
+                0x00800066                . = ALIGN (0x2)
+                0x00800066                _edata = .
+                0x00800066                PROVIDE (__data_end, .)
+
+.bss            0x00800066       0x1a
+                0x00800066                PROVIDE (__bss_start, .)
+ *(.bss)
+ .bss           0x00800066        0x1 snake.o
+                0x00800066                snakeLen
+ *(COMMON)
+ COMMON         0x00800067       0x19 snake.o
+                                  0x0 (size before relaxing)
+                0x00800067                curDir
+                0x00800068                ledsDisplay
+                0x00800070                SNAKE
+                0x00800080                PROVIDE (__bss_end, .)
+                0x000006ae                __data_load_start = LOADADDR (.data)
+                0x000006b4                __data_load_end = (__data_load_start + SIZEOF (.data))
+
+.noinit         0x00800080        0x0
+                0x00800080                PROVIDE (__noinit_start, .)
+ *(.noinit*)
+                0x00800080                PROVIDE (__noinit_end, .)
+                0x00800080                _end = .
+                0x00800080                PROVIDE (__heap_start, .)
+
+.eeprom         0x00810000        0x0 load address 0x000006b4
+ *(.eeprom*)
+                0x00810000                __eeprom_end = .
+
+.stab           0x00000000      0xdb0
+ *(.stab)
+ .stab          0x00000000      0xdb0 snake.o
+
+.stabstr        0x00000000      0x98a
+ *(.stabstr)
+ .stabstr       0x00000000      0x98a snake.o
+                                  0x0 (size before relaxing)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment
+ *(.comment)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info)
+ *(.gnu.linkonce.wi.*)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+OUTPUT(snake.elf elf32-avr)
+
+Cross Reference Table
+
+Symbol                                            File
+SNAKE                                             snake.o
+__bad_interrupt                                   C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__bss_end                                         C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_clear_bss.o)
+__bss_start                                       C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_clear_bss.o)
+__data_end                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_copy_data.o)
+__data_load_start                                 C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_copy_data.o)
+__data_start                                      C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_copy_data.o)
+__do_clear_bss                                    C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_clear_bss.o)
+                                                  C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+                                                  snake.o
+__do_copy_data                                    C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_copy_data.o)
+                                                  C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+                                                  snake.o
+__epilogue_restores__                             C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_epilogue.o)
+                                                  C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+__heap_end                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__init                                            C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__mulsi3                                          C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_mulsi3.o)
+                                                  C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+__prologue_saves__                                C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_prologue.o)
+                                                  C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+__stack                                           C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+                                                  snake.o
+__udivmodsi4                                      C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\libgcc.a(_udivmodsi4.o)
+                                                  C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+__vector_1                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_10                                       C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_11                                       C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_12                                       C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_2                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_3                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_4                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_5                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_6                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_7                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_8                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_9                                        C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vector_default                                  C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+__vectors                                         C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+addSnake                                          snake.o
+checkLocation                                     snake.o
+checkMaxSnakeLen                                  snake.o
+checkforinput                                     snake.o
+curDir                                            snake.o
+decodedelay                                       snake.o
+delay                                             snake.o
+drawSnake                                         snake.o
+eatSnake                                          snake.o
+gameover                                          snake.o
+head                                              snake.o
+ledsDisplay                                       snake.o
+main                                              snake.o
+                                                  C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\crts8515.o
+matchStar                                         snake.o
+posStar                                           snake.o
+rand                                              C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+                                                  snake.o
+rand_r                                            C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+snakeLen                                          snake.o
+snakeStrike                                       snake.o
+srand                                             C:\WinAVR\bin\..\lib\gcc-lib\avr\3.3.2\..\..\..\..\avr\lib\libc.a(rand.o)
+tail                                              snake.o

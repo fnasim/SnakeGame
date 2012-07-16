@@ -1,0 +1,1368 @@
+   1               		.file	"snake.c"
+   2               		.arch at90s8515
+   3               	__SREG__ = 0x3f
+   4               	__SP_H__ = 0x3e
+   5               	__SP_L__ = 0x3d
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.global __do_copy_data
+   9               		.global __do_clear_bss
+  12               		.text
+  13               	.Ltext0:
+  66               	.global	head
+  67               		.data
+  70               	head:
+  71 0000 FF        		.byte	-1
+  72               	.global	tail
+  75               	tail:
+  76 0001 FF        		.byte	-1
+  77               	.global	snakeLen
+  78               	.global	snakeLen
+  79               		.section .bss
+  82               	snakeLen:
+  83 0000 00        		.skip 1,0
+  84               		.text
+  87               	.global	delay
+  89               	delay:
+   1:snake.c       **** //#define __AVRDEBUG
+   2:snake.c       **** 
+   3:snake.c       **** #undef __AVRDEBUG
+   4:snake.c       **** 
+   5:snake.c       **** #ifdef __AVRDEBUG
+   6:snake.c       **** #define MIPS		(unsigned long)100
+   7:snake.c       **** #define DELAYDEC    (unsigned long)10
+   8:snake.c       **** #define DELAYFULL	(unsigned long)MIPS * 2
+   9:snake.c       **** #define DELAYTMP	(unsigned long)MIPS / 32
+  10:snake.c       **** #else
+  11:snake.c       **** #define MIPS 		(unsigned long)8000
+  12:snake.c       **** #define DELAYDEC 	(unsigned long)MIPS / 16
+  13:snake.c       **** #define DELAYFULL	(unsigned long)MIPS * 3
+  14:snake.c       **** #define DELAYTMP	(unsigned long)MIPS / 32
+  15:snake.c       **** #endif
+  16:snake.c       **** 
+  17:snake.c       **** #include<avr/io.h>
+  18:snake.c       **** #include<stdlib.h>
+  19:snake.c       **** 
+  20:snake.c       **** #define KEYUP 		( unsigned char ) 0xFE  
+  21:snake.c       **** #define KEYDOWN 	( unsigned char ) 0xFD
+  22:snake.c       **** #define KEYLEFT 	( unsigned char ) 0xFB
+  23:snake.c       **** #define KEYRIGHT	( unsigned char ) 0xF7
+  24:snake.c       **** #define DIFUD 1
+  25:snake.c       **** #define DIFLR 4
+  26:snake.c       **** #define MAXX 8
+  27:snake.c       **** #define MAXY 8
+  28:snake.c       **** #define NOSNAKE -1
+  29:snake.c       **** #define MINSNAKELEN 4
+  30:snake.c       **** #define MAXSNAKELEN 8
+  31:snake.c       **** 
+  32:snake.c       **** // possible directions of snake movement
+  33:snake.c       **** #define 	UP		(unsigned char) KEYUP 
+  34:snake.c       **** #define 	DOWN 	(unsigned char) KEYDOWN
+  35:snake.c       **** #define 	RIGHT	(unsigned char) KEYRIGHT
+  36:snake.c       **** #define		LEFT	(unsigned char) KEYLEFT
+  37:snake.c       **** 
+  38:snake.c       **** unsigned char curDir;
+  39:snake.c       **** void checkforinput (void);
+  40:snake.c       **** 
+  41:snake.c       **** struct snake
+  42:snake.c       **** {
+  43:snake.c       **** 	unsigned char indexLedsDisplay;
+  44:snake.c       **** 	unsigned char bitNumber;
+  45:snake.c       **** };
+  46:snake.c       **** 
+  47:snake.c       **** struct snake SNAKE[MAXSNAKELEN];
+  48:snake.c       **** 
+  49:snake.c       **** // this two-dimesional array holds
+  50:snake.c       **** // the state of the LEDs in a XxY matrix
+  51:snake.c       **** unsigned char ledsDisplay [MAXY];
+  52:snake.c       **** 
+  53:snake.c       **** // hold information of snake head and tail
+  54:snake.c       **** signed char head=NOSNAKE,tail=NOSNAKE;
+  55:snake.c       **** 
+  56:snake.c       **** // counts the length of snake
+  57:snake.c       **** unsigned char snakeLen=0;
+  58:snake.c       **** 
+  59:snake.c       **** void eatSnake ( char snakesize, char x, char y ,char found );
+  60:snake.c       **** void addSnake ( char x , char y );
+  61:snake.c       **** void drawSnake( void );
+  62:snake.c       **** unsigned char checkLocation( char randX,char randY );
+  63:snake.c       **** void posStar( signed char* randX, signed char* randY,signed char found );
+  64:snake.c       **** unsigned char matchStar(signed char randX, signed char randY, signed char x, signed char y);
+  65:snake.c       **** signed char snakeStrike(signed char headX, signed char headY);
+  66:snake.c       **** void checkMaxSnakeLen ( unsigned long* refresh, char* headX, char* headY, char* randX, char* randY,
+  67:snake.c       **** void keyPosition( char* key, signed char curDir );
+  68:snake.c       **** 
+  69:snake.c       **** 
+  70:snake.c       **** void delay ( unsigned long  d ) 
+  71:snake.c       **** {
+  91               	.LM1:
+  92               	/* prologue: frame size=0 */
+  93 0000 EF92      		push r14
+  94 0002 FF92      		push r15
+  95 0004 0F93      		push r16
+  96 0006 1F93      		push r17
+  97               	/* prologue end (size=4) */
+  98 0008 E62E      		mov r14,r22
+  99 000a F72E      		mov r15,r23
+ 100 000c 082F      		mov r16,r24
+ 101 000e 192F      		mov r17,r25
+  72:snake.c       **** 	checkforinput () ;
+ 103               	.LM2:
+ 104               	.LBB2:
+ 105 0010 2DD2      		rcall checkforinput
+  73:snake.c       **** 
+  74:snake.c       **** 	for ( int i = 0 ; i < 1000 ; i ++ ) 
+ 107               	.LM3:
+ 108 0012 47EE      		ldi r20,lo8(999)
+ 109 0014 53E0      		ldi r21,hi8(999)
+ 110               	.L11:
+  75:snake.c       **** 		for ( int j = 0 ; j < d ; j ++ ) ;
+ 112               	.LM4:
+ 113               	.LBB3:
+ 114               	.LBB4:
+ 115 0016 20E0      		ldi r18,lo8(0)
+ 116 0018 30E0      		ldi r19,hi8(0)
+ 117 001a E114      		cp r14,__zero_reg__
+ 118 001c F104      		cpc r15,__zero_reg__
+ 119 001e 0105      		cpc r16,__zero_reg__
+ 120 0020 1105      		cpc r17,__zero_reg__
+ 121 0022 69F0      		breq .L15
+ 122               	.L10:
+ 123 0024 2F5F      		subi r18,lo8(-(1))
+ 124 0026 3F4F      		sbci r19,hi8(-(1))
+ 125 0028 822F      		mov r24,r18
+ 126 002a 932F      		mov r25,r19
+ 127 002c AA27      		clr r26
+ 128 002e 97FD      		sbrc r25,7
+ 129 0030 A095      		com r26
+ 130 0032 BA2F      		mov r27,r26
+ 131 0034 8E15      		cp r24,r14
+ 132 0036 9F05      		cpc r25,r15
+ 133 0038 A007      		cpc r26,r16
+ 134 003a B107      		cpc r27,r17
+ 135 003c 98F3      		brlo .L10
+ 136               	.L15:
+ 138               	.LM5:
+ 139 003e 4150      		subi r20,lo8(-(-1))
+ 140 0040 5040      		sbci r21,hi8(-(-1))
+ 141 0042 57FF      		sbrs r21,7
+ 142 0044 E8CF      		rjmp .L11
+  76:snake.c       **** 		
+  77:snake.c       **** 	checkforinput ( );
+ 144               	.LM6:
+ 145               	.LBE4:
+ 146               	.LBE3:
+ 147 0046 12D2      		rcall checkforinput
+  78:snake.c       **** }
+ 149               	.LM7:
+ 150               	.LBE2:
+ 151               	/* epilogue: frame size=0 */
+ 152 0048 1F91      		pop r17
+ 153 004a 0F91      		pop r16
+ 154 004c FF90      		pop r15
+ 155 004e EF90      		pop r14
+ 156 0050 0895      		ret
+ 157               	/* epilogue end (size=5) */
+ 158               	/* function delay size 41 (32) */
+ 166               	.Lscope0:
+ 169               	.global	decodedelay
+ 171               	decodedelay:
+  79:snake.c       **** 
+  80:snake.c       **** void decodedelay (void)
+  81:snake.c       **** {
+ 173               	.LM8:
+ 174               	/* prologue: frame size=0 */
+ 175               	/* prologue end (size=0) */
+  82:snake.c       **** 	delay (DELAYTMP);
+ 177               	.LM9:
+ 178 0052 6AEF      		ldi r22,lo8(250)
+ 179 0054 70E0      		ldi r23,hi8(250)
+ 180 0056 80E0      		ldi r24,hlo8(250)
+ 181 0058 90E0      		ldi r25,hhi8(250)
+ 182 005a D2DF      		rcall delay
+  83:snake.c       **** }
+ 184               	.LM10:
+ 185               	/* epilogue: frame size=0 */
+ 186 005c 0895      		ret
+ 187               	/* epilogue end (size=1) */
+ 188               	/* function decodedelay size 6 (5) */
+ 190               	.Lscope1:
+ 197               	.global	eatSnake
+ 199               	eatSnake:
+  84:snake.c       **** 
+  85:snake.c       **** // Delete the tail of Snake if it moves
+  86:snake.c       **** void eatSnake ( char snakesize, char x, char y ,char found )
+  87:snake.c       **** {
+ 201               	.LM11:
+ 202               	/* prologue: frame size=0 */
+ 203               	/* prologue end (size=0) */
+ 204 005e 522F      		mov r21,r18
+  88:snake.c       **** 	if ( snakeLen < snakesize ) return ;
+ 206               	.LM12:
+ 207               	.LBB5:
+ 208 0060 4091 0000 		lds r20,snakeLen
+ 209 0064 4817      		cp r20,r24
+ 210 0066 38F1      		brlo .L17
+  89:snake.c       **** 	if ( found )  return;
+ 212               	.LM13:
+ 213 0068 2223      		tst r18
+ 214 006a 29F5      		brne .L17
+  90:snake.c       **** 
+  91:snake.c       **** 	//update ledsDisplay
+  92:snake.c       **** 	unsigned char temp=1;
+  93:snake.c       **** 	ledsDisplay[SNAKE[tail].indexLedsDisplay] = (ledsDisplay[SNAKE[tail].indexLedsDisplay])^((temp<<SN
+ 216               	.LM14:
+ 217 006c 3091 0000 		lds r19,tail
+ 218 0070 E32F      		mov r30,r19
+ 219 0072 FF27      		clr r31
+ 220 0074 E7FD      		sbrc r30,7
+ 221 0076 F095      		com r31
+ 222 0078 EE0F      		add r30,r30
+ 223 007a FF1F      		adc r31,r31
+ 224 007c E050      		subi r30,lo8(-(SNAKE))
+ 225 007e F040      		sbci r31,hi8(-(SNAKE))
+ 226 0080 8081      		ld r24,Z
+ 227 0082 A82F      		mov r26,r24
+ 228 0084 BB27      		clr r27
+ 229 0086 A050      		subi r26,lo8(-(ledsDisplay))
+ 230 0088 B040      		sbci r27,hi8(-(ledsDisplay))
+ 231 008a 81E0      		ldi r24,lo8(1)
+ 232 008c 90E0      		ldi r25,hi8(1)
+ 233 008e 0180      		ldd r0,Z+1
+ 234 0090 02C0      		rjmp 2f
+ 235 0092 880F      	1:	lsl r24
+ 236 0094 991F      		rol r25
+ 237 0096 0A94      	2:	dec r0
+ 238 0098 E2F7      		brpl 1b
+ 239 009a 2C91      		ld r18,X
+ 240 009c 2827      		eor r18,r24
+ 241 009e 2C93      		st X,r18
+  94:snake.c       **** 
+  95:snake.c       **** 	if( tail == MAXSNAKELEN-1 )
+ 243               	.LM15:
+ 244 00a0 3730      		cpi r19,lo8(7)
+ 245 00a2 19F4      		brne .L20
+  96:snake.c       **** 		tail = 0;
+ 247               	.LM16:
+ 248 00a4 5093 0000 		sts tail,r21
+ 249 00a8 03C0      		rjmp .L21
+ 250               	.L20:
+  97:snake.c       **** 	else
+  98:snake.c       **** 		tail++;
+ 252               	.LM17:
+ 253 00aa 3F5F      		subi r19,lo8(-(1))
+ 254 00ac 3093 0000 		sts tail,r19
+ 255               	.L21:
+  99:snake.c       **** 
+ 100:snake.c       **** 	snakeLen--;
+ 257               	.LM18:
+ 258 00b0 4150      		subi r20,lo8(-(-1))
+ 259 00b2 4093 0000 		sts snakeLen,r20
+ 101:snake.c       **** }
+ 261               	.LM19:
+ 262               	.L17:
+ 263 00b6 0895      		ret
+ 264               	.LBE5:
+ 265               	/* epilogue: frame size=0 */
+ 266               	/* epilogue: noreturn */
+ 267               	/* epilogue end (size=0) */
+ 268               	/* function eatSnake size 45 (45) */
+ 270               	.Lscope2:
+ 275               	.global	addSnake
+ 277               	addSnake:
+ 102:snake.c       **** 
+ 103:snake.c       **** void addSnake ( char x , char y )
+ 104:snake.c       **** {
+ 279               	.LM20:
+ 280               	/* prologue: frame size=0 */
+ 281               	/* prologue end (size=0) */
+ 282 00b8 982F      		mov r25,r24
+ 105:snake.c       **** 	//unsigned char temp=1;
+ 106:snake.c       **** 	if( head == NOSNAKE && tail == NOSNAKE )
+ 284               	.LM21:
+ 285 00ba 2091 0000 		lds r18,head
+ 286 00be 2F3F      		cpi r18,lo8(-1)
+ 287 00c0 49F4      		brne .L23
+ 288 00c2 8091 0000 		lds r24,tail
+ 289 00c6 8F3F      		cpi r24,lo8(-1)
+ 290 00c8 29F4      		brne .L23
+ 107:snake.c       **** 	{
+ 108:snake.c       **** 	 
+ 109:snake.c       **** 		head = 0;
+ 292               	.LM22:
+ 293 00ca 1092 0000 		sts head,__zero_reg__
+ 110:snake.c       **** 		tail = 0;
+ 295               	.LM23:
+ 296 00ce 1092 0000 		sts tail,__zero_reg__
+ 297 00d2 08C0      		rjmp .L24
+ 298               	.L23:
+ 111:snake.c       **** 	}
+ 112:snake.c       **** 	else if ( head == MAXSNAKELEN-1 )
+ 300               	.LM24:
+ 301 00d4 2730      		cpi r18,lo8(7)
+ 302 00d6 19F4      		brne .L25
+ 113:snake.c       **** 		head = 0;
+ 304               	.LM25:
+ 305 00d8 1092 0000 		sts head,__zero_reg__
+ 306 00dc 03C0      		rjmp .L24
+ 307               	.L25:
+ 114:snake.c       **** 	else
+ 115:snake.c       **** 		head++;
+ 309               	.LM26:
+ 310 00de 2F5F      		subi r18,lo8(-(1))
+ 311 00e0 2093 0000 		sts head,r18
+ 312               	.L24:
+ 116:snake.c       **** 
+ 117:snake.c       **** 	 // update ledsDisplay
+ 118:snake.c       **** 	SNAKE[head].indexLedsDisplay = y-1;
+ 314               	.LM27:
+ 315 00e4 8091 0000 		lds r24,head
+ 316 00e8 E82F      		mov r30,r24
+ 317 00ea FF27      		clr r31
+ 318 00ec E7FD      		sbrc r30,7
+ 319 00ee F095      		com r31
+ 320 00f0 EE0F      		add r30,r30
+ 321 00f2 FF1F      		adc r31,r31
+ 322 00f4 E050      		subi r30,lo8(-(SNAKE))
+ 323 00f6 F040      		sbci r31,hi8(-(SNAKE))
+ 324 00f8 6150      		subi r22,lo8(-(-1))
+ 325 00fa 6083      		st Z,r22
+ 326 00fc 6F5F      		subi r22,lo8(-(1))
+ 119:snake.c       **** 	SNAKE[head].bitNumber = x-1;
+ 328               	.LM28:
+ 329 00fe 9150      		subi r25,lo8(-(-1))
+ 330 0100 9183      		std Z+1,r25
+ 331 0102 9F5F      		subi r25,lo8(-(1))
+ 120:snake.c       **** 	//temp = temp<<(x-1);
+ 121:snake.c       **** 	ledsDisplay[y-1] = (ledsDisplay[y-1])^(1<<(x-1));// temp;
+ 333               	.LM29:
+ 334 0104 E62F      		mov r30,r22
+ 335 0106 FF27      		clr r31
+ 336 0108 E050      		subi r30,lo8(-(ledsDisplay-1))
+ 337 010a F040      		sbci r31,hi8(-(ledsDisplay-1))
+ 338 010c 892F      		mov r24,r25
+ 339 010e 9927      		clr r25
+ 340 0110 0197      		sbiw r24,1
+ 341 0112 21E0      		ldi r18,lo8(1)
+ 342 0114 30E0      		ldi r19,hi8(1)
+ 343 0116 02C0      		rjmp 2f
+ 344 0118 220F      	1:	lsl r18
+ 345 011a 331F      		rol r19
+ 346 011c 8A95      	2:	dec r24
+ 347 011e E2F7      		brpl 1b
+ 348 0120 8081      		ld r24,Z
+ 349 0122 8227      		eor r24,r18
+ 350 0124 8083      		st Z,r24
+ 122:snake.c       **** 	snakeLen++;
+ 352               	.LM30:
+ 353 0126 8091 0000 		lds r24,snakeLen
+ 354 012a 8F5F      		subi r24,lo8(-(1))
+ 355 012c 8093 0000 		sts snakeLen,r24
+ 123:snake.c       **** }
+ 357               	.LM31:
+ 358               	/* epilogue: frame size=0 */
+ 359 0130 0895      		ret
+ 360               	/* epilogue end (size=1) */
+ 361               	/* function addSnake size 62 (61) */
+ 363               	.Lscope3:
+ 366               	.global	drawSnake
+ 368               	drawSnake:
+ 124:snake.c       **** 
+ 125:snake.c       **** void drawSnake( void )
+ 126:snake.c       **** {
+ 370               	.LM32:
+ 371               	/* prologue: frame size=0 */
+ 372               	/* prologue end (size=0) */
+ 127:snake.c       **** 	for(unsigned char i=0;i<MAXY;i++)
+ 374               	.LM33:
+ 375               	.LBB6:
+ 376               	.LBB7:
+ 377 0132 90E0      		ldi r25,lo8(0)
+ 378 0134 E0E0      		ldi r30,lo8(ledsDisplay)
+ 379 0136 F0E0      		ldi r31,hi8(ledsDisplay)
+ 380               	.L32:
+ 128:snake.c       **** 	{
+ 129:snake.c       **** 		PORTD	=	i;					
+ 382               	.LM34:
+ 383 0138 92BB      		out 50-0x20,r25
+ 130:snake.c       **** 		PORTB	=	ledsDisplay[i];
+ 385               	.LM35:
+ 386 013a 8191      		ld r24,Z+
+ 387 013c 88BB      		out 56-0x20,r24
+ 389               	.LM36:
+ 390 013e 9F5F      		subi r25,lo8(-(1))
+ 391 0140 9830      		cpi r25,lo8(8)
+ 392 0142 D0F3      		brlo .L32
+ 131:snake.c       **** 	}
+ 132:snake.c       **** }
+ 394               	.LM37:
+ 395               	.LBE7:
+ 396               	.LBE6:
+ 397               	/* epilogue: frame size=0 */
+ 398 0144 0895      		ret
+ 399               	/* epilogue end (size=1) */
+ 400               	/* function drawSnake size 10 (9) */
+ 405               	.Lscope4:
+ 410               	.global	checkLocation
+ 412               	checkLocation:
+ 133:snake.c       **** // TODO: change the loop
+ 134:snake.c       **** ///////////////////////////////////////////////////////////
+ 135:snake.c       **** unsigned char checkLocation( char randX,char randY )
+ 136:snake.c       **** {
+ 414               	.LM38:
+ 415               	/* prologue: frame size=0 */
+ 416               	/* prologue end (size=0) */
+ 417 0146 782F      		mov r23,r24
+ 137:snake.c       **** 	for(signed char i=tail;i!=head;i++)
+ 419               	.LM39:
+ 420               	.LBB8:
+ 421               	.LBB9:
+ 422 0148 4091 0000 		lds r20,tail
+ 423 014c 5091 0000 		lds r21,head
+ 424 0150 4517      		cp r20,r21
+ 425 0152 19F1      		breq .L44
+ 426               	.L42:
+ 138:snake.c       **** 	{
+ 139:snake.c       **** 		if( (SNAKE[i].indexLedsDisplay==randY-1) && (SNAKE[i].bitNumber==randX-1) )
+ 428               	.LM40:
+ 429 0154 E42F      		mov r30,r20
+ 430 0156 FF27      		clr r31
+ 431 0158 E7FD      		sbrc r30,7
+ 432 015a F095      		com r31
+ 433 015c EE0F      		add r30,r30
+ 434 015e FF1F      		adc r31,r31
+ 435 0160 E050      		subi r30,lo8(-(SNAKE))
+ 436 0162 F040      		sbci r31,hi8(-(SNAKE))
+ 437 0164 8081      		ld r24,Z
+ 438 0166 282F      		mov r18,r24
+ 439 0168 3327      		clr r19
+ 440 016a 862F      		mov r24,r22
+ 441 016c 9927      		clr r25
+ 442 016e 0197      		sbiw r24,1
+ 443 0170 2817      		cp r18,r24
+ 444 0172 3907      		cpc r19,r25
+ 445 0174 61F4      		brne .L40
+ 446 0176 8181      		ldd r24,Z+1
+ 447 0178 282F      		mov r18,r24
+ 448 017a 3327      		clr r19
+ 449 017c 872F      		mov r24,r23
+ 450 017e 9927      		clr r25
+ 451 0180 0197      		sbiw r24,1
+ 452 0182 2817      		cp r18,r24
+ 453 0184 3907      		cpc r19,r25
+ 454 0186 19F4      		brne .L40
+ 140:snake.c       **** 			return 1;
+ 456               	.LM41:
+ 457 0188 81E0      		ldi r24,lo8(1)
+ 458 018a 90E0      		ldi r25,hi8(1)
+ 141:snake.c       **** 		if(i==MAXSNAKELEN)
+ 142:snake.c       **** 			i=-1;
+ 143:snake.c       **** 	}
+ 144:snake.c       **** 	return 0;
+ 145:snake.c       **** }
+ 460               	.LM42:
+ 461 018c 0895      		ret
+ 462               	.L40:
+ 464               	.LM43:
+ 465 018e 4830      		cpi r20,lo8(8)
+ 466 0190 09F4      		brne .L38
+ 468               	.LM44:
+ 469 0192 4FEF      		ldi r20,lo8(-1)
+ 471               	.LM45:
+ 472               	.L38:
+ 473 0194 4F5F      		subi r20,lo8(-(1))
+ 474 0196 4517      		cp r20,r21
+ 475 0198 E9F6      		brne .L42
+ 476               	.L44:
+ 478               	.LM46:
+ 479               	.LBE9:
+ 480 019a 80E0      		ldi r24,lo8(0)
+ 481 019c 90E0      		ldi r25,hi8(0)
+ 483               	.LM47:
+ 484 019e 0895      		ret
+ 485               	.LBE8:
+ 486               	/* epilogue: frame size=0 */
+ 487               	/* epilogue: noreturn */
+ 488               	/* epilogue end (size=0) */
+ 489               	/* function checkLocation size 45 (45) */
+ 494               	.Lscope5:
+ 500               	.global	posStar
+ 502               	posStar:
+ 146:snake.c       **** ////////////////////////////////////////////////////////////
+ 147:snake.c       **** 
+ 148:snake.c       **** void posStar( signed char* randX, signed char* randY,signed char found )
+ 149:snake.c       **** {
+ 504               	.LM48:
+ 505               	/* prologue: frame size=0 */
+ 506 01a0 0F93      		push r16
+ 507 01a2 1F93      		push r17
+ 508 01a4 CF93      		push r28
+ 509 01a6 DF93      		push r29
+ 510               	/* prologue end (size=4) */
+ 511 01a8 D92F      		mov r29,r25
+ 512 01aa C82F      		mov r28,r24
+ 513 01ac 062F      		mov r16,r22
+ 514 01ae 172F      		mov r17,r23
+ 150:snake.c       **** 	if( (found == 1) || (*randX == NOSNAKE && *randY == NOSNAKE) )
+ 516               	.LM49:
+ 517 01b0 4130      		cpi r20,lo8(1)
+ 518 01b2 49F0      		breq .L48
+ 519 01b4 8881      		ld r24,Y
+ 520 01b6 8F3F      		cpi r24,lo8(-1)
+ 521 01b8 09F0      		breq .+2
+ 522 01ba 3CC0      		rjmp .L45
+ 523 01bc F72F      		mov r31,r23
+ 524 01be E62F      		mov r30,r22
+ 525 01c0 8081      		ld r24,Z
+ 526 01c2 8F3F      		cpi r24,lo8(-1)
+ 527 01c4 B9F5      		brne .L45
+ 528               	.L48:
+ 151:snake.c       **** 	{
+ 152:snake.c       **** 		do
+ 153:snake.c       **** 		{
+ 154:snake.c       **** 		*randX = rand()%MAXX+1; //for always non zero value 1
+ 530               	.LM50:
+ 531 01c6 00D0      		rcall rand
+ 532 01c8 282F      		mov r18,r24
+ 533 01ca 392F      		mov r19,r25
+ 534 01cc 97FF      		sbrs r25,7
+ 535 01ce 02C0      		rjmp .L51
+ 536 01d0 295F      		subi r18,lo8(-(7))
+ 537 01d2 3F4F      		sbci r19,hi8(-(7))
+ 538               	.L51:
+ 539 01d4 287F      		andi r18,lo8(-8)
+ 540 01d6 821B      		sub r24,r18
+ 541 01d8 930B      		sbc r25,r19
+ 542 01da 8F5F      		subi r24,lo8(-(1))
+ 543 01dc 8883      		st Y,r24
+ 155:snake.c       **** 		*randY = rand()%MAXY+1;
+ 545               	.LM51:
+ 546 01de 00D0      		rcall rand
+ 547 01e0 282F      		mov r18,r24
+ 548 01e2 392F      		mov r19,r25
+ 549 01e4 97FF      		sbrs r25,7
+ 550 01e6 02C0      		rjmp .L52
+ 551 01e8 295F      		subi r18,lo8(-(7))
+ 552 01ea 3F4F      		sbci r19,hi8(-(7))
+ 553               	.L52:
+ 554 01ec 287F      		andi r18,lo8(-8)
+ 555 01ee 821B      		sub r24,r18
+ 556 01f0 930B      		sbc r25,r19
+ 557 01f2 8F5F      		subi r24,lo8(-(1))
+ 558 01f4 F12F      		mov r31,r17
+ 559 01f6 E02F      		mov r30,r16
+ 560 01f8 8083      		st Z,r24
+ 156:snake.c       **** 		}
+ 562               	.LM52:
+ 563 01fa 682F      		mov r22,r24
+ 564 01fc 8881      		ld r24,Y
+ 565 01fe A3DF      		rcall checkLocation
+ 566 0200 8823      		tst r24
+ 567 0202 09F7      		brne .L48
+ 157:snake.c       **** 		while( checkLocation(*randX,*randY) );
+ 158:snake.c       **** 		//Update the display for star here
+ 159:snake.c       **** 		//char temp=1;
+ 160:snake.c       **** 		ledsDisplay[*randY-1] = ledsDisplay[*randY-1] ^ (1<<(*randX-1));
+ 569               	.LM53:
+ 570 0204 F12F      		mov r31,r17
+ 571 0206 E02F      		mov r30,r16
+ 572 0208 8081      		ld r24,Z
+ 573 020a E82F      		mov r30,r24
+ 574 020c FF27      		clr r31
+ 575 020e E7FD      		sbrc r30,7
+ 576 0210 F095      		com r31
+ 577 0212 E050      		subi r30,lo8(-(ledsDisplay-1))
+ 578 0214 F040      		sbci r31,hi8(-(ledsDisplay-1))
+ 579 0216 8881      		ld r24,Y
+ 580 0218 9927      		clr r25
+ 581 021a 87FD      		sbrc r24,7
+ 582 021c 9095      		com r25
+ 583 021e 0197      		sbiw r24,1
+ 584 0220 21E0      		ldi r18,lo8(1)
+ 585 0222 30E0      		ldi r19,hi8(1)
+ 586 0224 02C0      		rjmp 2f
+ 587 0226 220F      	1:	lsl r18
+ 588 0228 331F      		rol r19
+ 589 022a 8A95      	2:	dec r24
+ 590 022c E2F7      		brpl 1b
+ 591 022e 8081      		ld r24,Z
+ 592 0230 8227      		eor r24,r18
+ 593 0232 8083      		st Z,r24
+ 161:snake.c       **** 
+ 162:snake.c       **** 	}
+ 163:snake.c       **** }
+ 595               	.LM54:
+ 596               	.L45:
+ 597               	/* epilogue: frame size=0 */
+ 598 0234 DF91      		pop r29
+ 599 0236 CF91      		pop r28
+ 600 0238 1F91      		pop r17
+ 601 023a 0F91      		pop r16
+ 602 023c 0895      		ret
+ 603               	/* epilogue end (size=5) */
+ 604               	/* function posStar size 81 (72) */
+ 606               	.Lscope6:
+ 613               	.global	matchStar
+ 615               	matchStar:
+ 164:snake.c       **** 
+ 165:snake.c       **** unsigned char matchStar(signed char randX, signed char randY,signed char x,signed char y)
+ 166:snake.c       **** {
+ 617               	.LM55:
+ 618               	/* prologue: frame size=0 */
+ 619               	/* prologue end (size=0) */
+ 167:snake.c       **** 	if( x==randX && y==randY )
+ 621               	.LM56:
+ 622 023e 4817      		cp r20,r24
+ 623 0240 D1F4      		brne .L55
+ 624 0242 2617      		cp r18,r22
+ 625 0244 C1F4      		brne .L55
+ 168:snake.c       **** 	{
+ 169:snake.c       **** 		//UPDATE the leds to of star position as it will occupy by snake
+ 170:snake.c       **** 		//char temp=1;
+ 171:snake.c       **** 		ledsDisplay[randY-1] = ledsDisplay[randY-1] ^ (1<<(randX-1));
+ 627               	.LM57:
+ 628 0246 E22F      		mov r30,r18
+ 629 0248 FF27      		clr r31
+ 630 024a E7FD      		sbrc r30,7
+ 631 024c F095      		com r31
+ 632 024e E050      		subi r30,lo8(-(ledsDisplay-1))
+ 633 0250 F040      		sbci r31,hi8(-(ledsDisplay-1))
+ 634 0252 842F      		mov r24,r20
+ 635 0254 9927      		clr r25
+ 636 0256 87FD      		sbrc r24,7
+ 637 0258 9095      		com r25
+ 638 025a 0197      		sbiw r24,1
+ 639 025c 41E0      		ldi r20,lo8(1)
+ 640 025e 50E0      		ldi r21,hi8(1)
+ 641 0260 242F      		mov r18,r20
+ 642 0262 352F      		mov r19,r21
+ 643 0264 02C0      		rjmp 2f
+ 644 0266 220F      	1:	lsl r18
+ 645 0268 331F      		rol r19
+ 646 026a 8A95      	2:	dec r24
+ 647 026c E2F7      		brpl 1b
+ 648 026e 8081      		ld r24,Z
+ 649 0270 8227      		eor r24,r18
+ 650 0272 8083      		st Z,r24
+ 172:snake.c       **** 		return 1;
+ 652               	.LM58:
+ 653 0274 02C0      		rjmp .L54
+ 654               	.L55:
+ 173:snake.c       **** 	}
+ 174:snake.c       **** 	else return 0;
+ 656               	.LM59:
+ 657 0276 40E0      		ldi r20,lo8(0)
+ 658 0278 50E0      		ldi r21,hi8(0)
+ 175:snake.c       **** }
+ 660               	.LM60:
+ 661               	.L54:
+ 662 027a 952F      		mov r25,r21
+ 663 027c 842F      		mov r24,r20
+ 664               	/* epilogue: frame size=0 */
+ 665 027e 0895      		ret
+ 666               	/* epilogue end (size=1) */
+ 667               	/* function matchStar size 34 (33) */
+ 669               	.Lscope7:
+ 674               	.global	snakeStrike
+ 676               	snakeStrike:
+ 176:snake.c       **** 
+ 177:snake.c       **** // TODO : check 
+ 178:snake.c       **** signed char snakeStrike(signed char headX,signed char headY)
+ 179:snake.c       **** {
+ 678               	.LM61:
+ 679               	/* prologue: frame size=0 */
+ 680               	/* prologue end (size=0) */
+ 681 0280 782F      		mov r23,r24
+ 180:snake.c       **** 	for(signed char i=tail;i!=head;i++)
+ 683               	.LM62:
+ 684               	.LBB10:
+ 685               	.LBB11:
+ 686 0282 4091 0000 		lds r20,tail
+ 687 0286 5091 0000 		lds r21,head
+ 688 028a 4517      		cp r20,r21
+ 689 028c 39F1      		breq .L66
+ 690               	.L64:
+ 181:snake.c       **** 	{
+ 182:snake.c       **** 		
+ 183:snake.c       **** 
+ 184:snake.c       **** 		if( SNAKE[i].indexLedsDisplay == (headY-1) && SNAKE[i].bitNumber == (headX-1) )
+ 692               	.LM63:
+ 693 028e E42F      		mov r30,r20
+ 694 0290 FF27      		clr r31
+ 695 0292 E7FD      		sbrc r30,7
+ 696 0294 F095      		com r31
+ 697 0296 EE0F      		add r30,r30
+ 698 0298 FF1F      		adc r31,r31
+ 699 029a E050      		subi r30,lo8(-(SNAKE))
+ 700 029c F040      		sbci r31,hi8(-(SNAKE))
+ 701 029e 8081      		ld r24,Z
+ 702 02a0 282F      		mov r18,r24
+ 703 02a2 3327      		clr r19
+ 704 02a4 862F      		mov r24,r22
+ 705 02a6 9927      		clr r25
+ 706 02a8 87FD      		sbrc r24,7
+ 707 02aa 9095      		com r25
+ 708 02ac 0197      		sbiw r24,1
+ 709 02ae 2817      		cp r18,r24
+ 710 02b0 3907      		cpc r19,r25
+ 711 02b2 71F4      		brne .L62
+ 712 02b4 8181      		ldd r24,Z+1
+ 713 02b6 282F      		mov r18,r24
+ 714 02b8 3327      		clr r19
+ 715 02ba 872F      		mov r24,r23
+ 716 02bc 9927      		clr r25
+ 717 02be 87FD      		sbrc r24,7
+ 718 02c0 9095      		com r25
+ 719 02c2 0197      		sbiw r24,1
+ 720 02c4 2817      		cp r18,r24
+ 721 02c6 3907      		cpc r19,r25
+ 722 02c8 19F4      		brne .L62
+ 185:snake.c       **** 		{
+ 186:snake.c       **** 			//game over
+ 187:snake.c       **** 			//i dont know what to do after this
+ 188:snake.c       **** 			return - 1;
+ 724               	.LM64:
+ 725 02ca 8FEF      		ldi r24,lo8(-1)
+ 726 02cc 9FEF      		ldi r25,hi8(-1)
+ 189:snake.c       **** 		}
+ 190:snake.c       **** 		if( i==MAXSNAKELEN )	i=-1;
+ 191:snake.c       **** 	}
+ 192:snake.c       **** 	return 0;
+ 193:snake.c       **** 	
+ 194:snake.c       **** }
+ 728               	.LM65:
+ 729 02ce 0895      		ret
+ 730               	.L62:
+ 732               	.LM66:
+ 733 02d0 4830      		cpi r20,lo8(8)
+ 734 02d2 09F4      		brne .L60
+ 735 02d4 4FEF      		ldi r20,lo8(-1)
+ 737               	.LM67:
+ 738               	.L60:
+ 739 02d6 4F5F      		subi r20,lo8(-(1))
+ 740 02d8 4517      		cp r20,r21
+ 741 02da C9F6      		brne .L64
+ 742               	.L66:
+ 744               	.LM68:
+ 745               	.LBE11:
+ 746 02dc 80E0      		ldi r24,lo8(0)
+ 747 02de 90E0      		ldi r25,hi8(0)
+ 749               	.LM69:
+ 750 02e0 0895      		ret
+ 751               	.LBE10:
+ 752               	/* epilogue: frame size=0 */
+ 753               	/* epilogue: noreturn */
+ 754               	/* epilogue end (size=0) */
+ 755               	/* function snakeStrike size 49 (49) */
+ 760               	.Lscope8:
+ 769               	.global	checkMaxSnakeLen
+ 771               	checkMaxSnakeLen:
+ 195:snake.c       **** 
+ 196:snake.c       **** void checkMaxSnakeLen ( unsigned long* refresh, char* headX, char* headY, char* randX, char* randY,
+ 197:snake.c       **** {
+ 773               	.LM70:
+ 774               	/* prologue: frame size=0 */
+ 775 02e2 8F92      		push r8
+ 776 02e4 9F92      		push r9
+ 777 02e6 AF92      		push r10
+ 778 02e8 BF92      		push r11
+ 779 02ea CF92      		push r12
+ 780 02ec DF92      		push r13
+ 781 02ee EF92      		push r14
+ 782 02f0 FF92      		push r15
+ 783 02f2 0F93      		push r16
+ 784 02f4 1F93      		push r17
+ 785 02f6 CF93      		push r28
+ 786 02f8 DF93      		push r29
+ 787               	/* prologue end (size=12) */
+ 788 02fa D92F      		mov r29,r25
+ 789 02fc C82F      		mov r28,r24
+ 790 02fe C62E      		mov r12,r22
+ 791 0300 D72E      		mov r13,r23
+ 792 0302 A42E      		mov r10,r20
+ 793 0304 B52E      		mov r11,r21
+ 794 0306 822E      		mov r8,r18
+ 795 0308 932E      		mov r9,r19
+ 198:snake.c       **** 	if( snakeLen == MAXSNAKELEN )
+ 797               	.LM71:
+ 798               	.LBB12:
+ 799 030a 8091 0000 		lds r24,snakeLen
+ 800 030e 8830      		cpi r24,lo8(8)
+ 801 0310 C1F5      		brne .L67
+ 199:snake.c       **** 	{
+ 200:snake.c       **** 		//restart i.e. reinitialize all variable with increased game speed(level)
+ 201:snake.c       **** 		delay(DELAYFULL);
+ 803               	.LM72:
+ 804 0312 60EC      		ldi r22,lo8(24000)
+ 805 0314 7DE5      		ldi r23,hi8(24000)
+ 806 0316 80E0      		ldi r24,hlo8(24000)
+ 807 0318 90E0      		ldi r25,hhi8(24000)
+ 808 031a 72DE      		rcall delay
+ 202:snake.c       **** 		if( *refresh > DELAYDEC  )
+ 810               	.LM73:
+ 811 031c 8881      		ld r24,Y
+ 812 031e 9981      		ldd r25,Y+1
+ 813 0320 AA81      		ldd r26,Y+2
+ 814 0322 BB81      		ldd r27,Y+3
+ 815 0324 853F      		cpi r24,lo8(501)
+ 816 0326 21E0      		ldi r18,hi8(501)
+ 817 0328 9207      		cpc r25,r18
+ 818 032a 20E0      		ldi r18,hlo8(501)
+ 819 032c A207      		cpc r26,r18
+ 820 032e 20E0      		ldi r18,hhi8(501)
+ 821 0330 B207      		cpc r27,r18
+ 822 0332 40F0      		brlo .L69
+ 203:snake.c       **** 			*refresh -= DELAYDEC;
+ 824               	.LM74:
+ 825 0334 845F      		subi r24,lo8(-(-500))
+ 826 0336 9140      		sbci r25,hi8(-(-500))
+ 827 0338 A040      		sbci r26,hlo8(-(-500))
+ 828 033a B040      		sbci r27,hhi8(-(-500))
+ 829 033c 8883      		st Y,r24
+ 830 033e 9983      		std Y+1,r25
+ 831 0340 AA83      		std Y+2,r26
+ 832 0342 BB83      		std Y+3,r27
+ 833               	.L69:
+ 204:snake.c       **** 		*headX = MAXX/2;
+ 835               	.LM75:
+ 836 0344 84E0      		ldi r24,lo8(4)
+ 837 0346 FD2D      		mov r31,r13
+ 838 0348 EC2D      		mov r30,r12
+ 839 034a 8083      		st Z,r24
+ 205:snake.c       **** 		*headY = MAXY/2;
+ 841               	.LM76:
+ 842 034c FB2D      		mov r31,r11
+ 843 034e EA2D      		mov r30,r10
+ 844 0350 8083      		st Z,r24
+ 206:snake.c       **** 		for(unsigned char i=0;i<MAXY;i++)
+ 846               	.LM77:
+ 847               	.LBB13:
+ 848 0352 80E0      		ldi r24,lo8(0)
+ 849 0354 E0E0      		ldi r30,lo8(ledsDisplay)
+ 850 0356 F0E0      		ldi r31,hi8(ledsDisplay)
+ 851               	.L74:
+ 207:snake.c       **** 			ledsDisplay[i] = 0;
+ 853               	.LM78:
+ 854 0358 1192      		st Z+,__zero_reg__
+ 856               	.LM79:
+ 857 035a 8F5F      		subi r24,lo8(-(1))
+ 858 035c 8830      		cpi r24,lo8(8)
+ 859 035e E0F3      		brlo .L74
+ 208:snake.c       **** 
+ 209:snake.c       **** 		snakeLen = 0;
+ 861               	.LM80:
+ 862               	.LBE13:
+ 863 0360 1092 0000 		sts snakeLen,__zero_reg__
+ 210:snake.c       **** 		head = NOSNAKE;
+ 865               	.LM81:
+ 866 0364 8FEF      		ldi r24,lo8(-1)
+ 867 0366 8093 0000 		sts head,r24
+ 211:snake.c       **** 		tail = NOSNAKE;
+ 869               	.LM82:
+ 870 036a 8093 0000 		sts tail,r24
+ 212:snake.c       **** 		*randX = NOSNAKE;
+ 872               	.LM83:
+ 873 036e F92D      		mov r31,r9
+ 874 0370 E82D      		mov r30,r8
+ 875 0372 8083      		st Z,r24
+ 213:snake.c       **** 		*randY = NOSNAKE;
+ 877               	.LM84:
+ 878 0374 F12F      		mov r31,r17
+ 879 0376 E02F      		mov r30,r16
+ 880 0378 8083      		st Z,r24
+ 214:snake.c       **** 		*curDir = UP;
+ 882               	.LM85:
+ 883 037a 8EEF      		ldi r24,lo8(-2)
+ 884 037c FF2D      		mov r31,r15
+ 885 037e EE2D      		mov r30,r14
+ 886 0380 8083      		st Z,r24
+ 215:snake.c       **** 	}
+ 216:snake.c       **** 
+ 217:snake.c       **** }
+ 888               	.LM86:
+ 889               	.L67:
+ 890               	.LBE12:
+ 891               	/* epilogue: frame size=0 */
+ 892 0382 DF91      		pop r29
+ 893 0384 CF91      		pop r28
+ 894 0386 1F91      		pop r17
+ 895 0388 0F91      		pop r16
+ 896 038a FF90      		pop r15
+ 897 038c EF90      		pop r14
+ 898 038e DF90      		pop r13
+ 899 0390 CF90      		pop r12
+ 900 0392 BF90      		pop r11
+ 901 0394 AF90      		pop r10
+ 902 0396 9F90      		pop r9
+ 903 0398 8F90      		pop r8
+ 904 039a 0895      		ret
+ 905               	/* epilogue end (size=13) */
+ 906               	/* function checkMaxSnakeLen size 93 (68) */
+ 911               	.Lscope9:
+ 914               	.global	gameover
+ 916               	gameover:
+ 218:snake.c       **** /*
+ 219:snake.c       **** void keyPosition( char * key, signed char curDir )
+ 220:snake.c       **** {
+ 221:snake.c       **** 	*key=0;
+ 222:snake.c       **** 	if( curDir==LEFT )
+ 223:snake.c       **** 		*key = 1;
+ 224:snake.c       **** 	if( curDir==RIGHT )
+ 225:snake.c       **** 		*key = 2;
+ 226:snake.c       **** 	if( curDir==UP )
+ 227:snake.c       **** 		*key = 4;
+ 228:snake.c       **** 	if( curDir==DOWN )
+ 229:snake.c       **** 		*key = 8;
+ 230:snake.c       **** }
+ 231:snake.c       **** */
+ 232:snake.c       **** 
+ 233:snake.c       **** void gameover ( void )
+ 234:snake.c       **** {
+ 918               	.LM87:
+ 919               	/* prologue: frame size=0 */
+ 920 039c 1F93      		push r17
+ 921 039e CF93      		push r28
+ 922               	/* prologue end (size=2) */
+ 235:snake.c       **** 	PORTB = 0;
+ 924               	.LM88:
+ 925               	.LBB14:
+ 926 03a0 18BA      		out 56-0x20,__zero_reg__
+ 236:snake.c       **** 
+ 237:snake.c       **** 	for ( int i = 0 ; i < 7 ; i++ )
+ 928               	.LM89:
+ 929               	.LBB15:
+ 930 03a2 80E0      		ldi r24,lo8(0)
+ 931 03a4 90E0      		ldi r25,hi8(0)
+ 932 03a6 E0E0      		ldi r30,lo8(ledsDisplay)
+ 933 03a8 F0E0      		ldi r31,hi8(ledsDisplay)
+ 934               	.L82:
+ 238:snake.c       **** 	{	ledsDisplay [i] = 0;
+ 936               	.LM90:
+ 937 03aa 1192      		st Z+,__zero_reg__
+ 239:snake.c       **** 		PORTD = i;
+ 939               	.LM91:
+ 940 03ac 82BB      		out 50-0x20,r24
+ 240:snake.c       **** 		PORTB = 0;
+ 942               	.LM92:
+ 943 03ae 18BA      		out 56-0x20,__zero_reg__
+ 945               	.LM93:
+ 946 03b0 0196      		adiw r24,1
+ 947 03b2 8730      		cpi r24,7
+ 948 03b4 9105      		cpc r25,__zero_reg__
+ 949 03b6 CCF3      		brlt .L82
+ 241:snake.c       **** 	}
+ 242:snake.c       **** 	
+ 243:snake.c       **** 	for ( unsigned char j = 0 ; j < 2 ; j ++ ) 
+ 951               	.LM94:
+ 952               	.LBE15:
+ 953               	.LBB16:
+ 954 03b8 10E0      		ldi r17,lo8(0)
+ 955               	.L92:
+ 244:snake.c       **** 	{
+ 245:snake.c       **** 		// turn the LEDs on
+ 246:snake.c       **** 		for ( unsigned char i = 0 ; i < MAXY ; i ++ ) 
+ 957               	.LM95:
+ 958               	.LBB17:
+ 959 03ba C0E0      		ldi r28,lo8(0)
+ 960               	.L91:
+ 247:snake.c       **** 		{
+ 248:snake.c       **** 			PORTD = i;
+ 962               	.LM96:
+ 963 03bc C2BB      		out 50-0x20,r28
+ 249:snake.c       **** 			PORTB = 0XFF;
+ 965               	.LM97:
+ 966 03be 8FEF      		ldi r24,lo8(-1)
+ 967 03c0 88BB      		out 56-0x20,r24
+ 250:snake.c       **** 			delay (MIPS/20);
+ 969               	.LM98:
+ 970 03c2 60E9      		ldi r22,lo8(400)
+ 971 03c4 71E0      		ldi r23,hi8(400)
+ 972 03c6 80E0      		ldi r24,hlo8(400)
+ 973 03c8 90E0      		ldi r25,hhi8(400)
+ 974 03ca 1ADE      		rcall delay
+ 251:snake.c       **** 			PORTB = 0x00;
+ 976               	.LM99:
+ 977 03cc 18BA      		out 56-0x20,__zero_reg__
+ 979               	.LM100:
+ 980 03ce CF5F      		subi r28,lo8(-(1))
+ 981 03d0 C830      		cpi r28,lo8(8)
+ 982 03d2 A0F3      		brlo .L91
+ 984               	.LM101:
+ 985               	.LBE17:
+ 986 03d4 1F5F      		subi r17,lo8(-(1))
+ 987 03d6 1230      		cpi r17,lo8(2)
+ 988 03d8 80F3      		brlo .L92
+ 252:snake.c       **** 		}
+ 253:snake.c       **** 	}
+ 254:snake.c       **** }
+ 990               	.LM102:
+ 991               	.LBE16:
+ 992               	.LBE14:
+ 993               	/* epilogue: frame size=0 */
+ 994 03da CF91      		pop r28
+ 995 03dc 1F91      		pop r17
+ 996 03de 0895      		ret
+ 997               	/* epilogue end (size=3) */
+ 998               	/* function gameover size 34 (29) */
+ 1009               	.Lscope10:
+ 1012               	.global	main
+ 1014               	main:
+ 255:snake.c       **** 
+ 256:snake.c       **** 
+ 257:snake.c       **** //MAIN
+ 258:snake.c       **** 
+ 259:snake.c       **** int main( void )
+ 260:snake.c       **** {
+ 1016               	.LM103:
+ 1017               	/* prologue: frame size=0 */
+ 1018 03e0 C0E0      		ldi r28,lo8(__stack - 0)
+ 1019 03e2 D0E0      		ldi r29,hi8(__stack - 0)
+ 1020 03e4 DEBF      		out __SP_H__,r29
+ 1021 03e6 CDBF      		out __SP_L__,r28
+ 1022               	/* prologue end (size=4) */
+ 261:snake.c       **** 	DDRA = 0xFF;
+ 1024               	.LM104:
+ 1025               	.LBB18:
+ 1026 03e8 8FEF      		ldi r24,lo8(-1)
+ 1027 03ea 8ABB      		out 58-0x20,r24
+ 262:snake.c       **** 	DDRB = 0XFF;
+ 1029               	.LM105:
+ 1030 03ec 87BB      		out 55-0x20,r24
+ 263:snake.c       **** 	DDRC = 0x00;
+ 1032               	.LM106:
+ 1033 03ee 14BA      		out 52-0x20,__zero_reg__
+ 264:snake.c       **** 	DDRD = 0xFF;
+ 1035               	.LM107:
+ 1036 03f0 81BB      		out 49-0x20,r24
+ 1037               	.L120:
+ 265:snake.c       **** 	
+ 266:snake.c       **** 	unsigned long refresh;
+ 267:snake.c       **** 	unsigned char minSnakeSize;
+ 268:snake.c       **** 	
+ 269:snake.c       **** 	signed char headX ,headY , randX , randY ;
+ 270:snake.c       **** 	char found;
+ 271:snake.c       **** 	
+ 272:snake.c       **** 	while ( 1 ) 
+ 273:snake.c       **** 	{
+ 274:snake.c       **** 		// init global vars
+ 275:snake.c       **** 		snakeLen = 0;
+ 1039               	.LM108:
+ 1040               	.LBB19:
+ 1041 03f2 1092 0000 		sts snakeLen,__zero_reg__
+ 276:snake.c       **** 		head = NOSNAKE;
+ 1043               	.LM109:
+ 1044 03f6 8FEF      		ldi r24,lo8(-1)
+ 1045 03f8 8093 0000 		sts head,r24
+ 277:snake.c       **** 		tail = NOSNAKE;
+ 1047               	.LM110:
+ 1048 03fc 8093 0000 		sts tail,r24
+ 278:snake.c       **** 
+ 279:snake.c       **** 			// move the snake in curDir after 'refresh' seconds
+ 280:snake.c       **** 		refresh = MIPS /  8;
+ 281:snake.c       **** 
+ 282:snake.c       **** 		// Store key information bit#1:R, bit#2: L, bit#3: U, bit#4: D
+ 283:snake.c       **** 		//char key=0;
+ 284:snake.c       **** 
+ 285:snake.c       **** 		// default snake length
+ 286:snake.c       **** 		minSnakeSize = MINSNAKELEN;
+ 287:snake.c       **** 
+ 288:snake.c       **** 		// holds the direction in which snake is moving
+ 289:snake.c       **** 		curDir = UP;
+ 1050               	.LM111:
+ 1051 0400 8EEF      		ldi r24,lo8(-2)
+ 1052 0402 8093 0000 		sts curDir,r24
+ 290:snake.c       **** 
+ 291:snake.c       **** 		// variables to store the next mouth position of snake
+ 292:snake.c       **** 		headX = MAXX/2 + 3;
+ 1054               	.LM112:
+ 1055 0406 C7E0      		ldi r28,lo8(7)
+ 293:snake.c       **** 		headY = MAXY/2 + 3;
+ 1057               	.LM113:
+ 1058 0408 1C2F      		mov r17,r28
+ 294:snake.c       **** 
+ 295:snake.c       **** 		// variables to hold the position of asterik that will be eaten by snake
+ 296:snake.c       **** 		// make bitfield if req
+ 297:snake.c       **** 		randX=NOSNAKE;
+ 298:snake.c       **** 		randY=NOSNAKE;
+ 299:snake.c       **** 
+ 300:snake.c       **** 		// to hold the key presses
+ 301:snake.c       **** 		char ch = 0;
+ 302:snake.c       **** 
+ 303:snake.c       **** 		// to determine whether star has found or not
+ 304:snake.c       **** 		found = 0; // temporary.. to fix: set to 1!
+ 305:snake.c       **** 
+ 306:snake.c       **** 		for ( signed char i = 0 ; i < MAXY ; i ++ ) 
+ 1060               	.LM114:
+ 1061               	.LBB20:
+ 1062 040a 80E0      		ldi r24,lo8(0)
+ 1063 040c E0E0      		ldi r30,lo8(ledsDisplay)
+ 1064 040e F0E0      		ldi r31,hi8(ledsDisplay)
+ 1065               	.L107:
+ 307:snake.c       **** 		{
+ 308:snake.c       **** 			ledsDisplay [i] = 0 ;
+ 1067               	.LM115:
+ 1068 0410 1192      		st Z+,__zero_reg__
+ 309:snake.c       **** 			PORTD = i;
+ 1070               	.LM116:
+ 1071 0412 82BB      		out 50-0x20,r24
+ 310:snake.c       **** 			PORTB = 0;
+ 1073               	.LM117:
+ 1074 0414 18BA      		out 56-0x20,__zero_reg__
+ 1076               	.LM118:
+ 1077 0416 8F5F      		subi r24,lo8(-(1))
+ 1078 0418 8830      		cpi r24,lo8(8)
+ 1079 041a D4F3      		brlt .L107
+ 311:snake.c       **** 		}
+ 312:snake.c       **** 		PORTD = 0;
+ 1081               	.LM119:
+ 1082               	.LBE20:
+ 1083 041c 12BA      		out 50-0x20,__zero_reg__
+ 1084               	.L119:
+ 313:snake.c       **** 
+ 314:snake.c       **** 		while ( 1 ) 
+ 315:snake.c       **** 		
+ 316:snake.c       **** 		{
+ 317:snake.c       **** /*
+ 318:snake.c       **** 			if ( PINC != 0 ) ch = PINC;
+ 319:snake.c       **** 
+ 320:snake.c       **** 			// Auto-assume if curdirection is already one which is press then ignore it
+ 321:snake.c       **** 			if( ( DIFUD != ( curDir-ch>=0?(curDir-ch):-(curDir-ch) ) ) && DIFLR != (curDir-ch>=0?(curDir-ch)
+ 322:snake.c       **** 				curDir = ch;
+ 323:snake.c       **** 			//Update position of key
+ 324:snake.c       **** 			//keyPosition(&key, curDir);
+ 325:snake.c       **** */
+ 326:snake.c       **** 
+ 327:snake.c       **** 			// determine next mouth position, based on current direction
+ 328:snake.c       **** 			if ( curDir == UP )
+ 1086               	.LM120:
+ 1087 041e 8091 0000 		lds r24,curDir
+ 1088 0422 8E3F      		cpi r24,lo8(-2)
+ 1089 0424 19F4      		brne .L111
+ 329:snake.c       **** 			{
+ 330:snake.c       **** 				headY--;
+ 1091               	.LM121:
+ 1092 0426 1150      		subi r17,lo8(-(-1))
+ 331:snake.c       **** 				if( headY == -1 )
+ 1094               	.LM122:
+ 1095 0428 1F3F      		cpi r17,lo8(-1)
+ 1096 042a F1F0      		breq .L109
+ 1097               	.L111:
+ 332:snake.c       **** 				{  // GAME OVER
+ 333:snake.c       **** 					break; 
+ 334:snake.c       **** 				}
+ 335:snake.c       **** 				
+ 336:snake.c       **** 			}
+ 337:snake.c       **** 				
+ 338:snake.c       **** 			if ( curDir == DOWN )
+ 1099               	.LM123:
+ 1100 042c 8D3F      		cpi r24,lo8(-3)
+ 1101 042e 19F4      		brne .L113
+ 339:snake.c       **** 			{
+ 340:snake.c       **** 				headY++;
+ 1103               	.LM124:
+ 1104 0430 1F5F      		subi r17,lo8(-(1))
+ 341:snake.c       **** 				if( headY == MAXY+1 )
+ 1106               	.LM125:
+ 1107 0432 1930      		cpi r17,lo8(9)
+ 1108 0434 C9F0      		breq .L109
+ 1109               	.L113:
+ 342:snake.c       **** 				{//GAME OVER 
+ 343:snake.c       **** 					break ; 
+ 344:snake.c       **** 			
+ 345:snake.c       **** 				}
+ 346:snake.c       **** 			
+ 347:snake.c       **** 			}
+ 348:snake.c       **** 			
+ 349:snake.c       **** 			if ( curDir == LEFT )
+ 1111               	.LM126:
+ 1112 0436 8B3F      		cpi r24,lo8(-5)
+ 1113 0438 19F4      		brne .L115
+ 350:snake.c       **** 			{
+ 351:snake.c       **** 				headX--;
+ 1115               	.LM127:
+ 1116 043a C150      		subi r28,lo8(-(-1))
+ 352:snake.c       **** 				if( headX == -1 )
+ 1118               	.LM128:
+ 1119 043c CF3F      		cpi r28,lo8(-1)
+ 1120 043e A1F0      		breq .L109
+ 1121               	.L115:
+ 353:snake.c       **** 				{// GAME OVER 
+ 354:snake.c       **** 					break ; 
+ 355:snake.c       **** 			
+ 356:snake.c       **** 				}
+ 357:snake.c       **** 			}
+ 358:snake.c       **** 			if ( curDir == RIGHT )
+ 1123               	.LM129:
+ 1124 0440 873F      		cpi r24,lo8(-9)
+ 1125 0442 19F4      		brne .L117
+ 359:snake.c       **** 			{
+ 360:snake.c       **** 				headX++;
+ 1127               	.LM130:
+ 1128 0444 CF5F      		subi r28,lo8(-(1))
+ 361:snake.c       **** 				if( headX == MAXX+1 ) 
+ 1130               	.LM131:
+ 1131 0446 C930      		cpi r28,lo8(9)
+ 1132 0448 79F0      		breq .L109
+ 1133               	.L117:
+ 362:snake.c       **** 				{//GAME OVER 
+ 363:snake.c       **** 					break; 
+ 364:snake.c       **** 			
+ 365:snake.c       **** 				}	
+ 366:snake.c       **** 			}
+ 367:snake.c       **** 			
+ 368:snake.c       **** 			// check snake strike with itself
+ 369:snake.c       **** //			if ( snakeStrike(headX,headY) == -1 )  break;
+ 370:snake.c       **** 			// determine the head is in position of star or not
+ 371:snake.c       **** //			found = matchStar( randX,randY,headX,headY );
+ 372:snake.c       **** 			// position of star
+ 373:snake.c       **** //			posStar(&randX,&randY,found);
+ 374:snake.c       **** 			// increase snake size and turn on relevant LED
+ 375:snake.c       **** 			addSnake ( headX , headY );
+ 1135               	.LM132:
+ 1136 044a 612F      		mov r22,r17
+ 1137 044c 8C2F      		mov r24,r28
+ 1138 044e 34DE      		rcall addSnake
+ 376:snake.c       **** 			// eat any end bits of the snake, since we're increasing its size
+ 377:snake.c       **** 			eatSnake ( minSnakeSize,headX,headY,found );
+ 1140               	.LM133:
+ 1141 0450 20E0      		ldi r18,lo8(0)
+ 1142 0452 412F      		mov r20,r17
+ 1143 0454 6C2F      		mov r22,r28
+ 1144 0456 84E0      		ldi r24,lo8(4)
+ 1145 0458 02DE      		rcall eatSnake
+ 378:snake.c       **** 			// check for maximum sankeLen
+ 379:snake.c       **** //			checkMaxSnakeLen( &refresh,&headX,&headY,&randX,&randY,&curDir );
+ 380:snake.c       **** 			// DrawSnake
+ 381:snake.c       **** 			drawSnake();
+ 1147               	.LM134:
+ 1148 045a 6BDE      		rcall drawSnake
+ 382:snake.c       **** 			
+ 383:snake.c       **** 			delay(refresh);
+ 1150               	.LM135:
+ 1151 045c 68EE      		ldi r22,lo8(1000)
+ 1152 045e 73E0      		ldi r23,hi8(1000)
+ 1153 0460 80E0      		ldi r24,hlo8(1000)
+ 1154 0462 90E0      		ldi r25,hhi8(1000)
+ 1155 0464 CDDD      		rcall delay
+ 1156 0466 DBCF      		rjmp .L119
+ 1157               	.L109:
+ 384:snake.c       **** 		}
+ 385:snake.c       **** 		gameover () ;
+ 1159               	.LM136:
+ 1160 0468 99DF      		rcall gameover
+ 1161               	.LBE19:
+ 1162 046a C3CF      		rjmp .L120
+ 386:snake.c       **** 	}
+ 387:snake.c       **** 	
+ 388:snake.c       **** 	return 0;
+ 389:snake.c       **** }
+ 1164               	.LM137:
+ 1165               	.LBE18:
+ 1166               	/* epilogue: frame size=0 */
+ 1167               	/* epilogue: noreturn */
+ 1168               	/* epilogue end (size=0) */
+ 1169               	/* function main size 70 (66) */
+ 1178               	.Lscope11:
+ 1181               	.global	checkforinput
+ 1183               	checkforinput:
+ 390:snake.c       **** 
+ 391:snake.c       **** void checkforinput (void)
+ 392:snake.c       **** {
+ 1185               	.LM138:
+ 1186               	/* prologue: frame size=0 */
+ 1187               	/* prologue end (size=0) */
+ 393:snake.c       **** 	if ( PINC == 0XFF )
+ 1189               	.LM139:
+ 1190 046c 83B3      		in r24,51-0x20
+ 1191 046e 8F3F      		cpi r24,lo8(-1)
+ 1192 0470 21F4      		brne .L124
+ 394:snake.c       **** 	{	
+ 395:snake.c       **** 		curDir = PINC;
+ 1194               	.LM140:
+ 1195 0472 83B3      		in r24,51-0x20
+ 1196 0474 8093 0000 		sts curDir,r24
+ 396:snake.c       **** 		return;
+ 1198               	.LM141:
+ 397:snake.c       **** 	}
+ 398:snake.c       **** 	
+ 399:snake.c       **** 	if ( curDir == PINC ) return;
+ 400:snake.c       **** 
+ 401:snake.c       **** 	// we have new input
+ 402:snake.c       **** 	curDir = PINC;
+ 403:snake.c       **** 	PORTB = 0;
+ 404:snake.c       **** 	
+ 405:snake.c       **** 	if ( curDir == KEYUP )
+ 406:snake.c       **** 		curDir = UP ;
+ 407:snake.c       **** 		
+ 408:snake.c       **** 	if ( curDir == KEYDOWN )
+ 409:snake.c       **** 		curDir = DOWN;
+ 410:snake.c       **** 		
+ 411:snake.c       **** 	if ( curDir == KEYLEFT ) 
+ 412:snake.c       **** 		curDir = LEFT ; 
+ 413:snake.c       **** 		
+ 414:snake.c       **** 	if ( curDir == KEYRIGHT ) 
+ 415:snake.c       **** 		curDir = RIGHT ;
+ 416:snake.c       **** 
+ 417:snake.c       **** 	
+ 418:snake.c       **** 
+ 419:snake.c       **** }
+ 1200               	.LM142:
+ 1201 0478 0895      		ret
+ 1202               	.L124:
+ 1204               	.LM143:
+ 1205 047a 9091 0000 		lds r25,curDir
+ 1206 047e 83B3      		in r24,51-0x20
+ 1207 0480 9817      		cp r25,r24
+ 1208 0482 21F0      		breq .L123
+ 1210               	.LM144:
+ 1211 0484 83B3      		in r24,51-0x20
+ 1212 0486 8093 0000 		sts curDir,r24
+ 1214               	.LM145:
+ 1215 048a 18BA      		out 56-0x20,__zero_reg__
+ 1217               	.LM146:
+ 1218               	.L123:
+ 1219 048c 0895      		ret
+ 1220               	/* epilogue: frame size=0 */
+ 1221 048e 0895      		ret
+ 1222               	/* epilogue end (size=1) */
+ 1223               	/* function checkforinput size 18 (17) */
+ 1225               	.Lscope12:
+ 1227               		.comm curDir,1,1
+ 1228               		.comm SNAKE,16,1
+ 1229               		.comm ledsDisplay,8,1
+ 1236               		.text
+ 1238               	Letext:
+ 1239               	/* File "snake.c": code  588 = 0x024c ( 531), prologues  26, epilogues  31 */
+DEFINED SYMBOLS
+                            *ABS*:00000000 snake.c
+                            *ABS*:0000003f __SREG__
+                            *ABS*:0000003e __SP_H__
+                            *ABS*:0000003d __SP_L__
+                            *ABS*:00000000 __tmp_reg__
+                            *ABS*:00000001 __zero_reg__
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:70     .data:00000000 head
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:75     .data:00000001 tail
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:82     .bss:00000000 snakeLen
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:89     .text:00000000 delay
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:1183   .text:0000046c checkforinput
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:171    .text:00000052 decodedelay
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:199    .text:0000005e eatSnake
+                            *COM*:00000010 SNAKE
+                            *COM*:00000008 ledsDisplay
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:277    .text:000000b8 addSnake
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:368    .text:00000132 drawSnake
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:412    .text:00000146 checkLocation
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:502    .text:000001a0 posStar
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:615    .text:0000023e matchStar
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:676    .text:00000280 snakeStrike
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:771    .text:000002e2 checkMaxSnakeLen
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:916    .text:0000039c gameover
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:1014   .text:000003e0 main
+                            *COM*:00000001 curDir
+C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp/ccygaaaa.s:1238   .text:00000490 Letext
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
+rand
+__stack

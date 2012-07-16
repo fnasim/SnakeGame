@@ -1,0 +1,1264 @@
+
+snake.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000006ae  00000000  00000000  00000094  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000006  00800060  000006ae  00000742  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          0000001a  00800066  00800066  00000748  2**0
+                  ALLOC
+  3 .noinit       00000000  00800080  00800080  00000748  2**0
+                  CONTENTS
+  4 .eeprom       00000000  00810000  00810000  00000748  2**0
+                  CONTENTS
+  5 .stab         00000db0  00000000  00000000  00000748  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  6 .stabstr      0000098a  00000000  00000000  000014f8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c c0       	rjmp	.+24     	; 0x1a
+   2:	26 c0       	rjmp	.+76     	; 0x50
+   4:	25 c0       	rjmp	.+74     	; 0x50
+   6:	24 c0       	rjmp	.+72     	; 0x50
+   8:	23 c0       	rjmp	.+70     	; 0x50
+   a:	22 c0       	rjmp	.+68     	; 0x50
+   c:	21 c0       	rjmp	.+66     	; 0x50
+   e:	20 c0       	rjmp	.+64     	; 0x50
+  10:	1f c0       	rjmp	.+62     	; 0x50
+  12:	1e c0       	rjmp	.+60     	; 0x50
+  14:	1d c0       	rjmp	.+58     	; 0x50
+  16:	1c c0       	rjmp	.+56     	; 0x50
+  18:	1b c0       	rjmp	.+54     	; 0x50
+
+0000001a <__ctors_end>:
+  1a:	11 24       	eor	r1, r1
+  1c:	1f be       	out	0x3f, r1	; 63
+  1e:	cf e5       	ldi	r28, 0x5F	; 95
+  20:	d2 e0       	ldi	r29, 0x02	; 2
+  22:	de bf       	out	0x3e, r29	; 62
+  24:	cd bf       	out	0x3d, r28	; 61
+
+00000026 <__do_copy_data>:
+  26:	10 e0       	ldi	r17, 0x00	; 0
+  28:	a0 e6       	ldi	r26, 0x60	; 96
+  2a:	b0 e0       	ldi	r27, 0x00	; 0
+  2c:	ee ea       	ldi	r30, 0xAE	; 174
+  2e:	f6 e0       	ldi	r31, 0x06	; 6
+  30:	03 c0       	rjmp	.+6      	; 0x38
+
+00000032 <.do_copy_data_loop>:
+  32:	c8 95       	lpm
+  34:	31 96       	adiw	r30, 0x01	; 1
+  36:	0d 92       	st	X+, r0
+
+00000038 <.do_copy_data_start>:
+  38:	a6 36       	cpi	r26, 0x66	; 102
+  3a:	b1 07       	cpc	r27, r17
+  3c:	d1 f7       	brne	.-12     	; 0x32
+
+0000003e <__do_clear_bss>:
+  3e:	10 e0       	ldi	r17, 0x00	; 0
+  40:	a6 e6       	ldi	r26, 0x66	; 102
+  42:	b0 e0       	ldi	r27, 0x00	; 0
+  44:	01 c0       	rjmp	.+2      	; 0x48
+
+00000046 <.do_clear_bss_loop>:
+  46:	1d 92       	st	X+, r1
+
+00000048 <.do_clear_bss_start>:
+  48:	a0 38       	cpi	r26, 0x80	; 128
+  4a:	b1 07       	cpc	r27, r17
+  4c:	e1 f7       	brne	.-8      	; 0x46
+  4e:	f1 c1       	rjmp	.+994    	; 0x432
+
+00000050 <__bad_interrupt>:
+  50:	d7 cf       	rjmp	.-82     	; 0x0
+
+00000052 <delay>:
+void keyPosition( char* key, signed char curDir );
+
+
+void delay ( unsigned long  d ) 
+{
+  52:	ef 92       	push	r14
+  54:	ff 92       	push	r15
+  56:	0f 93       	push	r16
+  58:	1f 93       	push	r17
+  5a:	e6 2e       	mov	r14, r22
+  5c:	f7 2e       	mov	r15, r23
+  5e:	08 2f       	mov	r16, r24
+  60:	19 2f       	mov	r17, r25
+	checkforinput () ;
+  62:	2d d2       	rcall	.+1114   	; 0x4be
+
+	for ( int i = 0 ; i < 1000 ; i ++ ) 
+  64:	47 ee       	ldi	r20, 0xE7	; 231
+  66:	53 e0       	ldi	r21, 0x03	; 3
+		for ( int j = 0 ; j < d ; j ++ ) ;
+  68:	20 e0       	ldi	r18, 0x00	; 0
+  6a:	30 e0       	ldi	r19, 0x00	; 0
+  6c:	e1 14       	cp	r14, r1
+  6e:	f1 04       	cpc	r15, r1
+  70:	01 05       	cpc	r16, r1
+  72:	11 05       	cpc	r17, r1
+  74:	69 f0       	breq	.+26     	; 0x90
+  76:	2f 5f       	subi	r18, 0xFF	; 255
+  78:	3f 4f       	sbci	r19, 0xFF	; 255
+  7a:	82 2f       	mov	r24, r18
+  7c:	93 2f       	mov	r25, r19
+  7e:	aa 27       	eor	r26, r26
+  80:	97 fd       	sbrc	r25, 7
+  82:	a0 95       	com	r26
+  84:	ba 2f       	mov	r27, r26
+  86:	8e 15       	cp	r24, r14
+  88:	9f 05       	cpc	r25, r15
+  8a:	a0 07       	cpc	r26, r16
+  8c:	b1 07       	cpc	r27, r17
+  8e:	98 f3       	brcs	.-26     	; 0x76
+  90:	41 50       	subi	r20, 0x01	; 1
+  92:	50 40       	sbci	r21, 0x00	; 0
+  94:	57 ff       	sbrs	r21, 7
+  96:	e8 cf       	rjmp	.-48     	; 0x68
+		
+	checkforinput ( );
+  98:	12 d2       	rcall	.+1060   	; 0x4be
+}
+  9a:	1f 91       	pop	r17
+  9c:	0f 91       	pop	r16
+  9e:	ff 90       	pop	r15
+  a0:	ef 90       	pop	r14
+  a2:	08 95       	ret
+
+000000a4 <decodedelay>:
+
+void decodedelay (void)
+{
+	delay (DELAYTMP);
+  a4:	6a ef       	ldi	r22, 0xFA	; 250
+  a6:	70 e0       	ldi	r23, 0x00	; 0
+  a8:	80 e0       	ldi	r24, 0x00	; 0
+  aa:	90 e0       	ldi	r25, 0x00	; 0
+  ac:	d2 df       	rcall	.-92     	; 0x52
+}
+  ae:	08 95       	ret
+
+000000b0 <eatSnake>:
+
+// Delete the tail of Snake if it moves
+void eatSnake ( char snakesize, char x, char y ,char found )
+{
+  b0:	52 2f       	mov	r21, r18
+	if ( snakeLen < snakesize ) return ;
+  b2:	40 91 66 00 	lds	r20, 0x0066
+  b6:	48 17       	cp	r20, r24
+  b8:	38 f1       	brcs	.+78     	; 0x108
+	if ( found )  return;
+  ba:	22 23       	and	r18, r18
+  bc:	29 f5       	brne	.+74     	; 0x108
+
+	//update ledsDisplay
+	unsigned char temp=1;
+	ledsDisplay[SNAKE[tail].indexLedsDisplay] = (ledsDisplay[SNAKE[tail].indexLedsDisplay])^((temp<<SNAKE[tail].bitNumber));
+  be:	30 91 61 00 	lds	r19, 0x0061
+  c2:	e3 2f       	mov	r30, r19
+  c4:	ff 27       	eor	r31, r31
+  c6:	e7 fd       	sbrc	r30, 7
+  c8:	f0 95       	com	r31
+  ca:	ee 0f       	add	r30, r30
+  cc:	ff 1f       	adc	r31, r31
+  ce:	e0 59       	subi	r30, 0x90	; 144
+  d0:	ff 4f       	sbci	r31, 0xFF	; 255
+  d2:	80 81       	ld	r24, Z
+  d4:	a8 2f       	mov	r26, r24
+  d6:	bb 27       	eor	r27, r27
+  d8:	a8 59       	subi	r26, 0x98	; 152
+  da:	bf 4f       	sbci	r27, 0xFF	; 255
+  dc:	81 e0       	ldi	r24, 0x01	; 1
+  de:	90 e0       	ldi	r25, 0x00	; 0
+  e0:	01 80       	ldd	r0, Z+1	; 0x01
+  e2:	02 c0       	rjmp	.+4      	; 0xe8
+  e4:	88 0f       	add	r24, r24
+  e6:	99 1f       	adc	r25, r25
+  e8:	0a 94       	dec	r0
+  ea:	e2 f7       	brpl	.-8      	; 0xe4
+  ec:	2c 91       	ld	r18, X
+  ee:	28 27       	eor	r18, r24
+  f0:	2c 93       	st	X, r18
+
+	if( tail == MAXSNAKELEN-1 )
+  f2:	37 30       	cpi	r19, 0x07	; 7
+  f4:	19 f4       	brne	.+6      	; 0xfc
+		tail = 0;
+  f6:	50 93 61 00 	sts	0x0061, r21
+  fa:	03 c0       	rjmp	.+6      	; 0x102
+	else
+		tail++;
+  fc:	3f 5f       	subi	r19, 0xFF	; 255
+  fe:	30 93 61 00 	sts	0x0061, r19
+
+	snakeLen--;
+ 102:	41 50       	subi	r20, 0x01	; 1
+ 104:	40 93 66 00 	sts	0x0066, r20
+}
+ 108:	08 95       	ret
+
+0000010a <addSnake>:
+
+void addSnake ( char x , char y )
+{
+ 10a:	98 2f       	mov	r25, r24
+	//unsigned char temp=1;
+	if( head == NOSNAKE && tail == NOSNAKE )
+ 10c:	20 91 60 00 	lds	r18, 0x0060
+ 110:	2f 3f       	cpi	r18, 0xFF	; 255
+ 112:	49 f4       	brne	.+18     	; 0x126
+ 114:	80 91 61 00 	lds	r24, 0x0061
+ 118:	8f 3f       	cpi	r24, 0xFF	; 255
+ 11a:	29 f4       	brne	.+10     	; 0x126
+	{
+	 
+		head = 0;
+ 11c:	10 92 60 00 	sts	0x0060, r1
+		tail = 0;
+ 120:	10 92 61 00 	sts	0x0061, r1
+ 124:	08 c0       	rjmp	.+16     	; 0x136
+	}
+	else if ( head == MAXSNAKELEN-1 )
+ 126:	27 30       	cpi	r18, 0x07	; 7
+ 128:	19 f4       	brne	.+6      	; 0x130
+		head = 0;
+ 12a:	10 92 60 00 	sts	0x0060, r1
+ 12e:	03 c0       	rjmp	.+6      	; 0x136
+	else
+		head++;
+ 130:	2f 5f       	subi	r18, 0xFF	; 255
+ 132:	20 93 60 00 	sts	0x0060, r18
+
+	 // update ledsDisplay
+	SNAKE[head].indexLedsDisplay = y-1;
+ 136:	80 91 60 00 	lds	r24, 0x0060
+ 13a:	e8 2f       	mov	r30, r24
+ 13c:	ff 27       	eor	r31, r31
+ 13e:	e7 fd       	sbrc	r30, 7
+ 140:	f0 95       	com	r31
+ 142:	ee 0f       	add	r30, r30
+ 144:	ff 1f       	adc	r31, r31
+ 146:	e0 59       	subi	r30, 0x90	; 144
+ 148:	ff 4f       	sbci	r31, 0xFF	; 255
+ 14a:	61 50       	subi	r22, 0x01	; 1
+ 14c:	60 83       	st	Z, r22
+ 14e:	6f 5f       	subi	r22, 0xFF	; 255
+	SNAKE[head].bitNumber = x-1;
+ 150:	91 50       	subi	r25, 0x01	; 1
+ 152:	91 83       	std	Z+1, r25	; 0x01
+ 154:	9f 5f       	subi	r25, 0xFF	; 255
+	//temp = temp<<(x-1);
+	ledsDisplay[y-1] = (ledsDisplay[y-1])^(1<<(x-1));// temp;
+ 156:	e6 2f       	mov	r30, r22
+ 158:	ff 27       	eor	r31, r31
+ 15a:	e9 59       	subi	r30, 0x99	; 153
+ 15c:	ff 4f       	sbci	r31, 0xFF	; 255
+ 15e:	89 2f       	mov	r24, r25
+ 160:	99 27       	eor	r25, r25
+ 162:	01 97       	sbiw	r24, 0x01	; 1
+ 164:	21 e0       	ldi	r18, 0x01	; 1
+ 166:	30 e0       	ldi	r19, 0x00	; 0
+ 168:	02 c0       	rjmp	.+4      	; 0x16e
+ 16a:	22 0f       	add	r18, r18
+ 16c:	33 1f       	adc	r19, r19
+ 16e:	8a 95       	dec	r24
+ 170:	e2 f7       	brpl	.-8      	; 0x16a
+ 172:	80 81       	ld	r24, Z
+ 174:	82 27       	eor	r24, r18
+ 176:	80 83       	st	Z, r24
+	snakeLen++;
+ 178:	80 91 66 00 	lds	r24, 0x0066
+ 17c:	8f 5f       	subi	r24, 0xFF	; 255
+ 17e:	80 93 66 00 	sts	0x0066, r24
+}
+ 182:	08 95       	ret
+
+00000184 <drawSnake>:
+
+void drawSnake( void )
+{
+	for(unsigned char i=0;i<MAXY;i++)
+ 184:	90 e0       	ldi	r25, 0x00	; 0
+ 186:	e8 e6       	ldi	r30, 0x68	; 104
+ 188:	f0 e0       	ldi	r31, 0x00	; 0
+	{
+		PORTD	=	i;					
+ 18a:	92 bb       	out	0x12, r25	; 18
+		PORTB	=	ledsDisplay[i];
+ 18c:	81 91       	ld	r24, Z+
+ 18e:	88 bb       	out	0x18, r24	; 24
+ 190:	9f 5f       	subi	r25, 0xFF	; 255
+ 192:	98 30       	cpi	r25, 0x08	; 8
+ 194:	d0 f3       	brcs	.-12     	; 0x18a
+	}
+}
+ 196:	08 95       	ret
+
+00000198 <checkLocation>:
+// TODO: change the loop
+///////////////////////////////////////////////////////////
+unsigned char checkLocation( char randX,char randY )
+{
+ 198:	78 2f       	mov	r23, r24
+	for(signed char i=tail;i!=head;i++)
+ 19a:	40 91 61 00 	lds	r20, 0x0061
+ 19e:	50 91 60 00 	lds	r21, 0x0060
+ 1a2:	45 17       	cp	r20, r21
+ 1a4:	19 f1       	breq	.+70     	; 0x1ec
+	{
+		if( (SNAKE[i].indexLedsDisplay==randY-1) && (SNAKE[i].bitNumber==randX-1) )
+ 1a6:	e4 2f       	mov	r30, r20
+ 1a8:	ff 27       	eor	r31, r31
+ 1aa:	e7 fd       	sbrc	r30, 7
+ 1ac:	f0 95       	com	r31
+ 1ae:	ee 0f       	add	r30, r30
+ 1b0:	ff 1f       	adc	r31, r31
+ 1b2:	e0 59       	subi	r30, 0x90	; 144
+ 1b4:	ff 4f       	sbci	r31, 0xFF	; 255
+ 1b6:	80 81       	ld	r24, Z
+ 1b8:	28 2f       	mov	r18, r24
+ 1ba:	33 27       	eor	r19, r19
+ 1bc:	86 2f       	mov	r24, r22
+ 1be:	99 27       	eor	r25, r25
+ 1c0:	01 97       	sbiw	r24, 0x01	; 1
+ 1c2:	28 17       	cp	r18, r24
+ 1c4:	39 07       	cpc	r19, r25
+ 1c6:	61 f4       	brne	.+24     	; 0x1e0
+ 1c8:	81 81       	ldd	r24, Z+1	; 0x01
+ 1ca:	28 2f       	mov	r18, r24
+ 1cc:	33 27       	eor	r19, r19
+ 1ce:	87 2f       	mov	r24, r23
+ 1d0:	99 27       	eor	r25, r25
+ 1d2:	01 97       	sbiw	r24, 0x01	; 1
+ 1d4:	28 17       	cp	r18, r24
+ 1d6:	39 07       	cpc	r19, r25
+ 1d8:	19 f4       	brne	.+6      	; 0x1e0
+			return 1;
+ 1da:	81 e0       	ldi	r24, 0x01	; 1
+ 1dc:	90 e0       	ldi	r25, 0x00	; 0
+		if(i==MAXSNAKELEN)
+			i=-1;
+	}
+	return 0;
+}
+ 1de:	08 95       	ret
+ 1e0:	48 30       	cpi	r20, 0x08	; 8
+ 1e2:	09 f4       	brne	.+2      	; 0x1e6
+ 1e4:	4f ef       	ldi	r20, 0xFF	; 255
+ 1e6:	4f 5f       	subi	r20, 0xFF	; 255
+ 1e8:	45 17       	cp	r20, r21
+ 1ea:	e9 f6       	brne	.-70     	; 0x1a6
+ 1ec:	80 e0       	ldi	r24, 0x00	; 0
+ 1ee:	90 e0       	ldi	r25, 0x00	; 0
+ 1f0:	08 95       	ret
+
+000001f2 <posStar>:
+////////////////////////////////////////////////////////////
+
+void posStar( signed char* randX, signed char* randY,signed char found )
+{
+ 1f2:	0f 93       	push	r16
+ 1f4:	1f 93       	push	r17
+ 1f6:	cf 93       	push	r28
+ 1f8:	df 93       	push	r29
+ 1fa:	d9 2f       	mov	r29, r25
+ 1fc:	c8 2f       	mov	r28, r24
+ 1fe:	06 2f       	mov	r16, r22
+ 200:	17 2f       	mov	r17, r23
+	if( (found == 1) || (*randX == NOSNAKE && *randY == NOSNAKE) )
+ 202:	41 30       	cpi	r20, 0x01	; 1
+ 204:	49 f0       	breq	.+18     	; 0x218
+ 206:	88 81       	ld	r24, Y
+ 208:	8f 3f       	cpi	r24, 0xFF	; 255
+ 20a:	09 f0       	breq	.+2      	; 0x20e
+ 20c:	3c c0       	rjmp	.+120    	; 0x286
+ 20e:	f7 2f       	mov	r31, r23
+ 210:	e6 2f       	mov	r30, r22
+ 212:	80 81       	ld	r24, Z
+ 214:	8f 3f       	cpi	r24, 0xFF	; 255
+ 216:	b9 f5       	brne	.+110    	; 0x286
+	{
+		do
+		{
+		*randX = rand()%MAXX+1; //for always non zero value 1
+ 218:	c1 d1       	rcall	.+898    	; 0x59c
+ 21a:	28 2f       	mov	r18, r24
+ 21c:	39 2f       	mov	r19, r25
+ 21e:	97 ff       	sbrs	r25, 7
+ 220:	02 c0       	rjmp	.+4      	; 0x226
+ 222:	29 5f       	subi	r18, 0xF9	; 249
+ 224:	3f 4f       	sbci	r19, 0xFF	; 255
+ 226:	28 7f       	andi	r18, 0xF8	; 248
+ 228:	82 1b       	sub	r24, r18
+ 22a:	93 0b       	sbc	r25, r19
+ 22c:	8f 5f       	subi	r24, 0xFF	; 255
+ 22e:	88 83       	st	Y, r24
+		*randY = rand()%MAXY+1;
+ 230:	b5 d1       	rcall	.+874    	; 0x59c
+ 232:	28 2f       	mov	r18, r24
+ 234:	39 2f       	mov	r19, r25
+ 236:	97 ff       	sbrs	r25, 7
+ 238:	02 c0       	rjmp	.+4      	; 0x23e
+ 23a:	29 5f       	subi	r18, 0xF9	; 249
+ 23c:	3f 4f       	sbci	r19, 0xFF	; 255
+ 23e:	28 7f       	andi	r18, 0xF8	; 248
+ 240:	82 1b       	sub	r24, r18
+ 242:	93 0b       	sbc	r25, r19
+ 244:	8f 5f       	subi	r24, 0xFF	; 255
+ 246:	f1 2f       	mov	r31, r17
+ 248:	e0 2f       	mov	r30, r16
+ 24a:	80 83       	st	Z, r24
+		}
+ 24c:	68 2f       	mov	r22, r24
+ 24e:	88 81       	ld	r24, Y
+ 250:	a3 df       	rcall	.-186    	; 0x198
+ 252:	88 23       	and	r24, r24
+ 254:	09 f7       	brne	.-62     	; 0x218
+		while( checkLocation(*randX,*randY) );
+		//Update the display for star here
+		//char temp=1;
+		ledsDisplay[*randY-1] = ledsDisplay[*randY-1] ^ (1<<(*randX-1));
+ 256:	f1 2f       	mov	r31, r17
+ 258:	e0 2f       	mov	r30, r16
+ 25a:	80 81       	ld	r24, Z
+ 25c:	e8 2f       	mov	r30, r24
+ 25e:	ff 27       	eor	r31, r31
+ 260:	e7 fd       	sbrc	r30, 7
+ 262:	f0 95       	com	r31
+ 264:	e9 59       	subi	r30, 0x99	; 153
+ 266:	ff 4f       	sbci	r31, 0xFF	; 255
+ 268:	88 81       	ld	r24, Y
+ 26a:	99 27       	eor	r25, r25
+ 26c:	87 fd       	sbrc	r24, 7
+ 26e:	90 95       	com	r25
+ 270:	01 97       	sbiw	r24, 0x01	; 1
+ 272:	21 e0       	ldi	r18, 0x01	; 1
+ 274:	30 e0       	ldi	r19, 0x00	; 0
+ 276:	02 c0       	rjmp	.+4      	; 0x27c
+ 278:	22 0f       	add	r18, r18
+ 27a:	33 1f       	adc	r19, r19
+ 27c:	8a 95       	dec	r24
+ 27e:	e2 f7       	brpl	.-8      	; 0x278
+ 280:	80 81       	ld	r24, Z
+ 282:	82 27       	eor	r24, r18
+ 284:	80 83       	st	Z, r24
+
+	}
+}
+ 286:	df 91       	pop	r29
+ 288:	cf 91       	pop	r28
+ 28a:	1f 91       	pop	r17
+ 28c:	0f 91       	pop	r16
+ 28e:	08 95       	ret
+
+00000290 <matchStar>:
+
+unsigned char matchStar(signed char randX, signed char randY,signed char x,signed char y)
+{
+	if( x==randX && y==randY )
+ 290:	48 17       	cp	r20, r24
+ 292:	d1 f4       	brne	.+52     	; 0x2c8
+ 294:	26 17       	cp	r18, r22
+ 296:	c1 f4       	brne	.+48     	; 0x2c8
+	{
+		//UPDATE the leds to of star position as it will occupy by snake
+		//char temp=1;
+		ledsDisplay[randY-1] = ledsDisplay[randY-1] ^ (1<<(randX-1));
+ 298:	e2 2f       	mov	r30, r18
+ 29a:	ff 27       	eor	r31, r31
+ 29c:	e7 fd       	sbrc	r30, 7
+ 29e:	f0 95       	com	r31
+ 2a0:	e9 59       	subi	r30, 0x99	; 153
+ 2a2:	ff 4f       	sbci	r31, 0xFF	; 255
+ 2a4:	84 2f       	mov	r24, r20
+ 2a6:	99 27       	eor	r25, r25
+ 2a8:	87 fd       	sbrc	r24, 7
+ 2aa:	90 95       	com	r25
+ 2ac:	01 97       	sbiw	r24, 0x01	; 1
+ 2ae:	41 e0       	ldi	r20, 0x01	; 1
+ 2b0:	50 e0       	ldi	r21, 0x00	; 0
+ 2b2:	24 2f       	mov	r18, r20
+ 2b4:	35 2f       	mov	r19, r21
+ 2b6:	02 c0       	rjmp	.+4      	; 0x2bc
+ 2b8:	22 0f       	add	r18, r18
+ 2ba:	33 1f       	adc	r19, r19
+ 2bc:	8a 95       	dec	r24
+ 2be:	e2 f7       	brpl	.-8      	; 0x2b8
+ 2c0:	80 81       	ld	r24, Z
+ 2c2:	82 27       	eor	r24, r18
+ 2c4:	80 83       	st	Z, r24
+		return 1;
+ 2c6:	02 c0       	rjmp	.+4      	; 0x2cc
+	}
+	else return 0;
+ 2c8:	40 e0       	ldi	r20, 0x00	; 0
+ 2ca:	50 e0       	ldi	r21, 0x00	; 0
+}
+ 2cc:	95 2f       	mov	r25, r21
+ 2ce:	84 2f       	mov	r24, r20
+ 2d0:	08 95       	ret
+
+000002d2 <snakeStrike>:
+
+// TODO : check 
+signed char snakeStrike(signed char headX,signed char headY)
+{
+ 2d2:	78 2f       	mov	r23, r24
+	for(signed char i=tail;i!=head;i++)
+ 2d4:	40 91 61 00 	lds	r20, 0x0061
+ 2d8:	50 91 60 00 	lds	r21, 0x0060
+ 2dc:	45 17       	cp	r20, r21
+ 2de:	39 f1       	breq	.+78     	; 0x32e
+	{
+		
+
+		if( SNAKE[i].indexLedsDisplay == (headY-1) && SNAKE[i].bitNumber == (headX-1) )
+ 2e0:	e4 2f       	mov	r30, r20
+ 2e2:	ff 27       	eor	r31, r31
+ 2e4:	e7 fd       	sbrc	r30, 7
+ 2e6:	f0 95       	com	r31
+ 2e8:	ee 0f       	add	r30, r30
+ 2ea:	ff 1f       	adc	r31, r31
+ 2ec:	e0 59       	subi	r30, 0x90	; 144
+ 2ee:	ff 4f       	sbci	r31, 0xFF	; 255
+ 2f0:	80 81       	ld	r24, Z
+ 2f2:	28 2f       	mov	r18, r24
+ 2f4:	33 27       	eor	r19, r19
+ 2f6:	86 2f       	mov	r24, r22
+ 2f8:	99 27       	eor	r25, r25
+ 2fa:	87 fd       	sbrc	r24, 7
+ 2fc:	90 95       	com	r25
+ 2fe:	01 97       	sbiw	r24, 0x01	; 1
+ 300:	28 17       	cp	r18, r24
+ 302:	39 07       	cpc	r19, r25
+ 304:	71 f4       	brne	.+28     	; 0x322
+ 306:	81 81       	ldd	r24, Z+1	; 0x01
+ 308:	28 2f       	mov	r18, r24
+ 30a:	33 27       	eor	r19, r19
+ 30c:	87 2f       	mov	r24, r23
+ 30e:	99 27       	eor	r25, r25
+ 310:	87 fd       	sbrc	r24, 7
+ 312:	90 95       	com	r25
+ 314:	01 97       	sbiw	r24, 0x01	; 1
+ 316:	28 17       	cp	r18, r24
+ 318:	39 07       	cpc	r19, r25
+ 31a:	19 f4       	brne	.+6      	; 0x322
+		{
+			//game over
+			//i dont know what to do after this
+			return - 1;
+ 31c:	8f ef       	ldi	r24, 0xFF	; 255
+ 31e:	9f ef       	ldi	r25, 0xFF	; 255
+		}
+		if( i==MAXSNAKELEN )	i=-1;
+	}
+	return 0;
+	
+}
+ 320:	08 95       	ret
+ 322:	48 30       	cpi	r20, 0x08	; 8
+ 324:	09 f4       	brne	.+2      	; 0x328
+ 326:	4f ef       	ldi	r20, 0xFF	; 255
+ 328:	4f 5f       	subi	r20, 0xFF	; 255
+ 32a:	45 17       	cp	r20, r21
+ 32c:	c9 f6       	brne	.-78     	; 0x2e0
+ 32e:	80 e0       	ldi	r24, 0x00	; 0
+ 330:	90 e0       	ldi	r25, 0x00	; 0
+ 332:	08 95       	ret
+
+00000334 <checkMaxSnakeLen>:
+
+void checkMaxSnakeLen ( unsigned long* refresh, char* headX, char* headY, char* randX, char* randY, signed char* curDir )
+{
+ 334:	8f 92       	push	r8
+ 336:	9f 92       	push	r9
+ 338:	af 92       	push	r10
+ 33a:	bf 92       	push	r11
+ 33c:	cf 92       	push	r12
+ 33e:	df 92       	push	r13
+ 340:	ef 92       	push	r14
+ 342:	ff 92       	push	r15
+ 344:	0f 93       	push	r16
+ 346:	1f 93       	push	r17
+ 348:	cf 93       	push	r28
+ 34a:	df 93       	push	r29
+ 34c:	d9 2f       	mov	r29, r25
+ 34e:	c8 2f       	mov	r28, r24
+ 350:	c6 2e       	mov	r12, r22
+ 352:	d7 2e       	mov	r13, r23
+ 354:	a4 2e       	mov	r10, r20
+ 356:	b5 2e       	mov	r11, r21
+ 358:	82 2e       	mov	r8, r18
+ 35a:	93 2e       	mov	r9, r19
+	if( snakeLen == MAXSNAKELEN )
+ 35c:	80 91 66 00 	lds	r24, 0x0066
+ 360:	88 30       	cpi	r24, 0x08	; 8
+ 362:	c1 f5       	brne	.+112    	; 0x3d4
+	{
+		//restart i.e. reinitialize all variable with increased game speed(level)
+		delay(DELAYFULL);
+ 364:	60 ec       	ldi	r22, 0xC0	; 192
+ 366:	7d e5       	ldi	r23, 0x5D	; 93
+ 368:	80 e0       	ldi	r24, 0x00	; 0
+ 36a:	90 e0       	ldi	r25, 0x00	; 0
+ 36c:	72 de       	rcall	.-796    	; 0x52
+		if( *refresh > DELAYDEC  )
+ 36e:	88 81       	ld	r24, Y
+ 370:	99 81       	ldd	r25, Y+1	; 0x01
+ 372:	aa 81       	ldd	r26, Y+2	; 0x02
+ 374:	bb 81       	ldd	r27, Y+3	; 0x03
+ 376:	85 3f       	cpi	r24, 0xF5	; 245
+ 378:	21 e0       	ldi	r18, 0x01	; 1
+ 37a:	92 07       	cpc	r25, r18
+ 37c:	20 e0       	ldi	r18, 0x00	; 0
+ 37e:	a2 07       	cpc	r26, r18
+ 380:	20 e0       	ldi	r18, 0x00	; 0
+ 382:	b2 07       	cpc	r27, r18
+ 384:	40 f0       	brcs	.+16     	; 0x396
+			*refresh -= DELAYDEC;
+ 386:	84 5f       	subi	r24, 0xF4	; 244
+ 388:	91 40       	sbci	r25, 0x01	; 1
+ 38a:	a0 40       	sbci	r26, 0x00	; 0
+ 38c:	b0 40       	sbci	r27, 0x00	; 0
+ 38e:	88 83       	st	Y, r24
+ 390:	99 83       	std	Y+1, r25	; 0x01
+ 392:	aa 83       	std	Y+2, r26	; 0x02
+ 394:	bb 83       	std	Y+3, r27	; 0x03
+		*headX = MAXX/2;
+ 396:	84 e0       	ldi	r24, 0x04	; 4
+ 398:	fd 2d       	mov	r31, r13
+ 39a:	ec 2d       	mov	r30, r12
+ 39c:	80 83       	st	Z, r24
+		*headY = MAXY/2;
+ 39e:	fb 2d       	mov	r31, r11
+ 3a0:	ea 2d       	mov	r30, r10
+ 3a2:	80 83       	st	Z, r24
+		for(unsigned char i=0;i<MAXY;i++)
+ 3a4:	80 e0       	ldi	r24, 0x00	; 0
+ 3a6:	e8 e6       	ldi	r30, 0x68	; 104
+ 3a8:	f0 e0       	ldi	r31, 0x00	; 0
+			ledsDisplay[i] = 0;
+ 3aa:	11 92       	st	Z+, r1
+ 3ac:	8f 5f       	subi	r24, 0xFF	; 255
+ 3ae:	88 30       	cpi	r24, 0x08	; 8
+ 3b0:	e0 f3       	brcs	.-8      	; 0x3aa
+
+		snakeLen = 0;
+ 3b2:	10 92 66 00 	sts	0x0066, r1
+		head = NOSNAKE;
+ 3b6:	8f ef       	ldi	r24, 0xFF	; 255
+ 3b8:	80 93 60 00 	sts	0x0060, r24
+		tail = NOSNAKE;
+ 3bc:	80 93 61 00 	sts	0x0061, r24
+		*randX = NOSNAKE;
+ 3c0:	f9 2d       	mov	r31, r9
+ 3c2:	e8 2d       	mov	r30, r8
+ 3c4:	80 83       	st	Z, r24
+		*randY = NOSNAKE;
+ 3c6:	f1 2f       	mov	r31, r17
+ 3c8:	e0 2f       	mov	r30, r16
+ 3ca:	80 83       	st	Z, r24
+		*curDir = UP;
+ 3cc:	8e ef       	ldi	r24, 0xFE	; 254
+ 3ce:	ff 2d       	mov	r31, r15
+ 3d0:	ee 2d       	mov	r30, r14
+ 3d2:	80 83       	st	Z, r24
+	}
+
+}
+ 3d4:	df 91       	pop	r29
+ 3d6:	cf 91       	pop	r28
+ 3d8:	1f 91       	pop	r17
+ 3da:	0f 91       	pop	r16
+ 3dc:	ff 90       	pop	r15
+ 3de:	ef 90       	pop	r14
+ 3e0:	df 90       	pop	r13
+ 3e2:	cf 90       	pop	r12
+ 3e4:	bf 90       	pop	r11
+ 3e6:	af 90       	pop	r10
+ 3e8:	9f 90       	pop	r9
+ 3ea:	8f 90       	pop	r8
+ 3ec:	08 95       	ret
+
+000003ee <gameover>:
+/*
+void keyPosition( char * key, signed char curDir )
+{
+	*key=0;
+	if( curDir==LEFT )
+		*key = 1;
+	if( curDir==RIGHT )
+		*key = 2;
+	if( curDir==UP )
+		*key = 4;
+	if( curDir==DOWN )
+		*key = 8;
+}
+*/
+
+void gameover ( void )
+{
+ 3ee:	1f 93       	push	r17
+ 3f0:	cf 93       	push	r28
+	PORTB = 0;
+ 3f2:	18 ba       	out	0x18, r1	; 24
+
+	for ( int i = 0 ; i < 7 ; i++ )
+ 3f4:	80 e0       	ldi	r24, 0x00	; 0
+ 3f6:	90 e0       	ldi	r25, 0x00	; 0
+ 3f8:	e8 e6       	ldi	r30, 0x68	; 104
+ 3fa:	f0 e0       	ldi	r31, 0x00	; 0
+	{	ledsDisplay [i] = 0;
+ 3fc:	11 92       	st	Z+, r1
+		PORTD = i;
+ 3fe:	82 bb       	out	0x12, r24	; 18
+		PORTB = 0;
+ 400:	18 ba       	out	0x18, r1	; 24
+ 402:	01 96       	adiw	r24, 0x01	; 1
+ 404:	87 30       	cpi	r24, 0x07	; 7
+ 406:	91 05       	cpc	r25, r1
+ 408:	cc f3       	brlt	.-14     	; 0x3fc
+	}
+	
+	for ( unsigned char j = 0 ; j < 2 ; j ++ ) 
+ 40a:	10 e0       	ldi	r17, 0x00	; 0
+	{
+		// turn the LEDs on
+		for ( unsigned char i = 0 ; i < MAXY ; i ++ ) 
+ 40c:	c0 e0       	ldi	r28, 0x00	; 0
+		{
+			PORTD = i;
+ 40e:	c2 bb       	out	0x12, r28	; 18
+			PORTB = 0XFF;
+ 410:	8f ef       	ldi	r24, 0xFF	; 255
+ 412:	88 bb       	out	0x18, r24	; 24
+			delay (MIPS/20);
+ 414:	60 e9       	ldi	r22, 0x90	; 144
+ 416:	71 e0       	ldi	r23, 0x01	; 1
+ 418:	80 e0       	ldi	r24, 0x00	; 0
+ 41a:	90 e0       	ldi	r25, 0x00	; 0
+ 41c:	1a de       	rcall	.-972    	; 0x52
+			PORTB = 0x00;
+ 41e:	18 ba       	out	0x18, r1	; 24
+ 420:	cf 5f       	subi	r28, 0xFF	; 255
+ 422:	c8 30       	cpi	r28, 0x08	; 8
+ 424:	a0 f3       	brcs	.-24     	; 0x40e
+ 426:	1f 5f       	subi	r17, 0xFF	; 255
+ 428:	12 30       	cpi	r17, 0x02	; 2
+ 42a:	80 f3       	brcs	.-32     	; 0x40c
+		}
+	}
+}
+ 42c:	cf 91       	pop	r28
+ 42e:	1f 91       	pop	r17
+ 430:	08 95       	ret
+
+00000432 <main>:
+
+
+//MAIN
+
+int main( void )
+{
+ 432:	cf e5       	ldi	r28, 0x5F	; 95
+ 434:	d2 e0       	ldi	r29, 0x02	; 2
+ 436:	de bf       	out	0x3e, r29	; 62
+ 438:	cd bf       	out	0x3d, r28	; 61
+	DDRA = 0xFF;
+ 43a:	8f ef       	ldi	r24, 0xFF	; 255
+ 43c:	8a bb       	out	0x1a, r24	; 26
+	DDRB = 0XFF;
+ 43e:	87 bb       	out	0x17, r24	; 23
+	DDRC = 0x00;
+ 440:	14 ba       	out	0x14, r1	; 20
+	DDRD = 0xFF;
+ 442:	81 bb       	out	0x11, r24	; 17
+	
+	unsigned long refresh;
+	unsigned char minSnakeSize;
+	
+	signed char headX ,headY , randX , randY ;
+	char found;
+	
+	while ( 1 ) 
+	{
+		// init global vars
+		snakeLen = 0;
+ 444:	10 92 66 00 	sts	0x0066, r1
+		head = NOSNAKE;
+ 448:	8f ef       	ldi	r24, 0xFF	; 255
+ 44a:	80 93 60 00 	sts	0x0060, r24
+		tail = NOSNAKE;
+ 44e:	80 93 61 00 	sts	0x0061, r24
+
+			// move the snake in curDir after 'refresh' seconds
+		refresh = MIPS /  8;
+
+		// Store key information bit#1:R, bit#2: L, bit#3: U, bit#4: D
+		//char key=0;
+
+		// default snake length
+		minSnakeSize = MINSNAKELEN;
+
+		// holds the direction in which snake is moving
+		curDir = UP;
+ 452:	8e ef       	ldi	r24, 0xFE	; 254
+ 454:	80 93 67 00 	sts	0x0067, r24
+
+		// variables to store the next mouth position of snake
+		headX = MAXX/2 + 3;
+ 458:	c7 e0       	ldi	r28, 0x07	; 7
+		headY = MAXY/2 + 3;
+ 45a:	1c 2f       	mov	r17, r28
+
+		// variables to hold the position of asterik that will be eaten by snake
+		// make bitfield if req
+		randX=NOSNAKE;
+		randY=NOSNAKE;
+
+		// to hold the key presses
+		char ch = 0;
+
+		// to determine whether star has found or not
+		found = 0; // temporary.. to fix: set to 1!
+
+		for ( signed char i = 0 ; i < MAXY ; i ++ ) 
+ 45c:	80 e0       	ldi	r24, 0x00	; 0
+ 45e:	e8 e6       	ldi	r30, 0x68	; 104
+ 460:	f0 e0       	ldi	r31, 0x00	; 0
+		{
+			ledsDisplay [i] = 0 ;
+ 462:	11 92       	st	Z+, r1
+			PORTD = i;
+ 464:	82 bb       	out	0x12, r24	; 18
+			PORTB = 0;
+ 466:	18 ba       	out	0x18, r1	; 24
+ 468:	8f 5f       	subi	r24, 0xFF	; 255
+ 46a:	88 30       	cpi	r24, 0x08	; 8
+ 46c:	d4 f3       	brlt	.-12     	; 0x462
+		}
+		PORTD = 0;
+ 46e:	12 ba       	out	0x12, r1	; 18
+
+		while ( 1 ) 
+		
+		{
+/*
+			if ( PINC != 0 ) ch = PINC;
+
+			// Auto-assume if curdirection is already one which is press then ignore it
+			if( ( DIFUD != ( curDir-ch>=0?(curDir-ch):-(curDir-ch) ) ) && DIFLR != (curDir-ch>=0?(curDir-ch):-(curDir-ch)) )
+				curDir = ch;
+			//Update position of key
+			//keyPosition(&key, curDir);
+*/
+
+			// determine next mouth position, based on current direction
+			if ( curDir == UP )
+ 470:	80 91 67 00 	lds	r24, 0x0067
+ 474:	8e 3f       	cpi	r24, 0xFE	; 254
+ 476:	19 f4       	brne	.+6      	; 0x47e
+			{
+				headY--;
+ 478:	11 50       	subi	r17, 0x01	; 1
+				if( headY == -1 )
+ 47a:	1f 3f       	cpi	r17, 0xFF	; 255
+ 47c:	f1 f0       	breq	.+60     	; 0x4ba
+				{  // GAME OVER
+					break; 
+				}
+				
+			}
+				
+			if ( curDir == DOWN )
+ 47e:	8d 3f       	cpi	r24, 0xFD	; 253
+ 480:	19 f4       	brne	.+6      	; 0x488
+			{
+				headY++;
+ 482:	1f 5f       	subi	r17, 0xFF	; 255
+				if( headY == MAXY+1 )
+ 484:	19 30       	cpi	r17, 0x09	; 9
+ 486:	c9 f0       	breq	.+50     	; 0x4ba
+				{//GAME OVER 
+					break ; 
+			
+				}
+			
+			}
+			
+			if ( curDir == LEFT )
+ 488:	8b 3f       	cpi	r24, 0xFB	; 251
+ 48a:	19 f4       	brne	.+6      	; 0x492
+			{
+				headX--;
+ 48c:	c1 50       	subi	r28, 0x01	; 1
+				if( headX == -1 )
+ 48e:	cf 3f       	cpi	r28, 0xFF	; 255
+ 490:	a1 f0       	breq	.+40     	; 0x4ba
+				{// GAME OVER 
+					break ; 
+			
+				}
+			}
+			if ( curDir == RIGHT )
+ 492:	87 3f       	cpi	r24, 0xF7	; 247
+ 494:	19 f4       	brne	.+6      	; 0x49c
+			{
+				headX++;
+ 496:	cf 5f       	subi	r28, 0xFF	; 255
+				if( headX == MAXX+1 ) 
+ 498:	c9 30       	cpi	r28, 0x09	; 9
+ 49a:	79 f0       	breq	.+30     	; 0x4ba
+				{//GAME OVER 
+					break; 
+			
+				}	
+			}
+			
+			// check snake strike with itself
+//			if ( snakeStrike(headX,headY) == -1 )  break;
+			// determine the head is in position of star or not
+//			found = matchStar( randX,randY,headX,headY );
+			// position of star
+//			posStar(&randX,&randY,found);
+			// increase snake size and turn on relevant LED
+			addSnake ( headX , headY );
+ 49c:	61 2f       	mov	r22, r17
+ 49e:	8c 2f       	mov	r24, r28
+ 4a0:	34 de       	rcall	.-920    	; 0x10a
+			// eat any end bits of the snake, since we're increasing its size
+			eatSnake ( minSnakeSize,headX,headY,found );
+ 4a2:	20 e0       	ldi	r18, 0x00	; 0
+ 4a4:	41 2f       	mov	r20, r17
+ 4a6:	6c 2f       	mov	r22, r28
+ 4a8:	84 e0       	ldi	r24, 0x04	; 4
+ 4aa:	02 de       	rcall	.-1020   	; 0xb0
+			// check for maximum sankeLen
+//			checkMaxSnakeLen( &refresh,&headX,&headY,&randX,&randY,&curDir );
+			// DrawSnake
+			drawSnake();
+ 4ac:	6b de       	rcall	.-810    	; 0x184
+			
+			delay(refresh);
+ 4ae:	68 ee       	ldi	r22, 0xE8	; 232
+ 4b0:	73 e0       	ldi	r23, 0x03	; 3
+ 4b2:	80 e0       	ldi	r24, 0x00	; 0
+ 4b4:	90 e0       	ldi	r25, 0x00	; 0
+ 4b6:	cd dd       	rcall	.-1126   	; 0x52
+ 4b8:	db cf       	rjmp	.-74     	; 0x470
+		}
+		gameover () ;
+ 4ba:	99 df       	rcall	.-206    	; 0x3ee
+ 4bc:	c3 cf       	rjmp	.-122    	; 0x444
+
+000004be <checkforinput>:
+	}
+	
+	return 0;
+}
+
+void checkforinput (void)
+{
+	if ( PINC == 0XFF )
+ 4be:	83 b3       	in	r24, 0x13	; 19
+ 4c0:	8f 3f       	cpi	r24, 0xFF	; 255
+ 4c2:	21 f4       	brne	.+8      	; 0x4cc
+	{	
+		curDir = PINC;
+ 4c4:	83 b3       	in	r24, 0x13	; 19
+ 4c6:	80 93 67 00 	sts	0x0067, r24
+		return;
+	}
+	
+	if ( curDir == PINC ) return;
+
+	// we have new input
+	curDir = PINC;
+	PORTB = 0;
+	
+	if ( curDir == KEYUP )
+		curDir = UP ;
+		
+	if ( curDir == KEYDOWN )
+		curDir = DOWN;
+		
+	if ( curDir == KEYLEFT ) 
+		curDir = LEFT ; 
+		
+	if ( curDir == KEYRIGHT ) 
+		curDir = RIGHT ;
+
+	
+
+}
+ 4ca:	08 95       	ret
+ 4cc:	90 91 67 00 	lds	r25, 0x0067
+ 4d0:	83 b3       	in	r24, 0x13	; 19
+ 4d2:	98 17       	cp	r25, r24
+ 4d4:	21 f0       	breq	.+8      	; 0x4de
+ 4d6:	83 b3       	in	r24, 0x13	; 19
+ 4d8:	80 93 67 00 	sts	0x0067, r24
+ 4dc:	18 ba       	out	0x18, r1	; 24
+ 4de:	08 95       	ret
+ 4e0:	08 95       	ret
+
+000004e2 <do_rand>:
+ 4e2:	a0 e0       	ldi	r26, 0x00	; 0
+ 4e4:	b0 e0       	ldi	r27, 0x00	; 0
+ 4e6:	e6 e7       	ldi	r30, 0x76	; 118
+ 4e8:	f2 e0       	ldi	r31, 0x02	; 2
+ 4ea:	b1 c0       	rjmp	.+354    	; 0x64e
+ 4ec:	d9 2f       	mov	r29, r25
+ 4ee:	c8 2f       	mov	r28, r24
+ 4f0:	e8 80       	ld	r14, Y
+ 4f2:	f9 80       	ldd	r15, Y+1	; 0x01
+ 4f4:	0a 81       	ldd	r16, Y+2	; 0x02
+ 4f6:	1b 81       	ldd	r17, Y+3	; 0x03
+ 4f8:	91 2f       	mov	r25, r17
+ 4fa:	80 2f       	mov	r24, r16
+ 4fc:	7f 2d       	mov	r23, r15
+ 4fe:	6e 2d       	mov	r22, r14
+ 500:	2d e1       	ldi	r18, 0x1D	; 29
+ 502:	33 ef       	ldi	r19, 0xF3	; 243
+ 504:	41 e0       	ldi	r20, 0x01	; 1
+ 506:	50 e0       	ldi	r21, 0x00	; 0
+ 508:	73 d0       	rcall	.+230    	; 0x5f0
+ 50a:	a2 2e       	mov	r10, r18
+ 50c:	b3 2e       	mov	r11, r19
+ 50e:	c4 2e       	mov	r12, r20
+ 510:	d5 2e       	mov	r13, r21
+ 512:	91 2f       	mov	r25, r17
+ 514:	80 2f       	mov	r24, r16
+ 516:	7f 2d       	mov	r23, r15
+ 518:	6e 2d       	mov	r22, r14
+ 51a:	2d e1       	ldi	r18, 0x1D	; 29
+ 51c:	33 ef       	ldi	r19, 0xF3	; 243
+ 51e:	41 e0       	ldi	r20, 0x01	; 1
+ 520:	50 e0       	ldi	r21, 0x00	; 0
+ 522:	66 d0       	rcall	.+204    	; 0x5f0
+ 524:	b9 2f       	mov	r27, r25
+ 526:	a8 2f       	mov	r26, r24
+ 528:	97 2f       	mov	r25, r23
+ 52a:	86 2f       	mov	r24, r22
+ 52c:	27 ea       	ldi	r18, 0xA7	; 167
+ 52e:	31 e4       	ldi	r19, 0x41	; 65
+ 530:	40 e0       	ldi	r20, 0x00	; 0
+ 532:	50 e0       	ldi	r21, 0x00	; 0
+ 534:	68 2f       	mov	r22, r24
+ 536:	79 2f       	mov	r23, r25
+ 538:	8a 2f       	mov	r24, r26
+ 53a:	9b 2f       	mov	r25, r27
+ 53c:	3e d0       	rcall	.+124    	; 0x5ba
+ 53e:	e6 2e       	mov	r14, r22
+ 540:	f7 2e       	mov	r15, r23
+ 542:	08 2f       	mov	r16, r24
+ 544:	19 2f       	mov	r17, r25
+ 546:	24 e1       	ldi	r18, 0x14	; 20
+ 548:	3b e0       	ldi	r19, 0x0B	; 11
+ 54a:	40 e0       	ldi	r20, 0x00	; 0
+ 54c:	50 e0       	ldi	r21, 0x00	; 0
+ 54e:	9d 2d       	mov	r25, r13
+ 550:	8c 2d       	mov	r24, r12
+ 552:	7b 2d       	mov	r23, r11
+ 554:	6a 2d       	mov	r22, r10
+ 556:	31 d0       	rcall	.+98     	; 0x5ba
+ 558:	b9 2f       	mov	r27, r25
+ 55a:	a8 2f       	mov	r26, r24
+ 55c:	97 2f       	mov	r25, r23
+ 55e:	86 2f       	mov	r24, r22
+ 560:	e8 1a       	sub	r14, r24
+ 562:	f9 0a       	sbc	r15, r25
+ 564:	0a 0b       	sbc	r16, r26
+ 566:	1b 0b       	sbc	r17, r27
+ 568:	b1 2f       	mov	r27, r17
+ 56a:	a0 2f       	mov	r26, r16
+ 56c:	9f 2d       	mov	r25, r15
+ 56e:	8e 2d       	mov	r24, r14
+ 570:	1e 14       	cp	r1, r14
+ 572:	1f 04       	cpc	r1, r15
+ 574:	10 06       	cpc	r1, r16
+ 576:	11 06       	cpc	r1, r17
+ 578:	24 f0       	brlt	.+8      	; 0x582
+ 57a:	81 50       	subi	r24, 0x01	; 1
+ 57c:	90 40       	sbci	r25, 0x00	; 0
+ 57e:	a0 40       	sbci	r26, 0x00	; 0
+ 580:	b0 48       	sbci	r27, 0x80	; 128
+ 582:	88 83       	st	Y, r24
+ 584:	99 83       	std	Y+1, r25	; 0x01
+ 586:	aa 83       	std	Y+2, r26	; 0x02
+ 588:	bb 83       	std	Y+3, r27	; 0x03
+ 58a:	9f 77       	andi	r25, 0x7F	; 127
+ 58c:	a0 70       	andi	r26, 0x00	; 0
+ 58e:	b0 70       	andi	r27, 0x00	; 0
+ 590:	ea e0       	ldi	r30, 0x0A	; 10
+ 592:	cd b7       	in	r28, 0x3d	; 61
+ 594:	de b7       	in	r29, 0x3e	; 62
+ 596:	77 c0       	rjmp	.+238    	; 0x686
+
+00000598 <rand_r>:
+ 598:	a4 df       	rcall	.-184    	; 0x4e2
+ 59a:	08 95       	ret
+
+0000059c <rand>:
+ 59c:	82 e6       	ldi	r24, 0x62	; 98
+ 59e:	90 e0       	ldi	r25, 0x00	; 0
+ 5a0:	a0 df       	rcall	.-192    	; 0x4e2
+ 5a2:	08 95       	ret
+
+000005a4 <srand>:
+ 5a4:	aa 27       	eor	r26, r26
+ 5a6:	bb 27       	eor	r27, r27
+ 5a8:	80 93 62 00 	sts	0x0062, r24
+ 5ac:	90 93 63 00 	sts	0x0063, r25
+ 5b0:	a0 93 64 00 	sts	0x0064, r26
+ 5b4:	b0 93 65 00 	sts	0x0065, r27
+ 5b8:	08 95       	ret
+
+000005ba <__mulsi3>:
+ 5ba:	ff 27       	eor	r31, r31
+ 5bc:	ee 27       	eor	r30, r30
+ 5be:	bb 27       	eor	r27, r27
+ 5c0:	aa 27       	eor	r26, r26
+
+000005c2 <__mulsi3_loop>:
+ 5c2:	60 ff       	sbrs	r22, 0
+ 5c4:	04 c0       	rjmp	.+8      	; 0x5ce
+ 5c6:	a2 0f       	add	r26, r18
+ 5c8:	b3 1f       	adc	r27, r19
+ 5ca:	e4 1f       	adc	r30, r20
+ 5cc:	f5 1f       	adc	r31, r21
+
+000005ce <__mulsi3_skip1>:
+ 5ce:	22 0f       	add	r18, r18
+ 5d0:	33 1f       	adc	r19, r19
+ 5d2:	44 1f       	adc	r20, r20
+ 5d4:	55 1f       	adc	r21, r21
+ 5d6:	96 95       	lsr	r25
+ 5d8:	87 95       	ror	r24
+ 5da:	77 95       	ror	r23
+ 5dc:	67 95       	ror	r22
+ 5de:	89 f7       	brne	.-30     	; 0x5c2
+ 5e0:	00 97       	sbiw	r24, 0x00	; 0
+ 5e2:	76 07       	cpc	r23, r22
+ 5e4:	71 f7       	brne	.-36     	; 0x5c2
+
+000005e6 <__mulsi3_exit>:
+ 5e6:	9f 2f       	mov	r25, r31
+ 5e8:	8e 2f       	mov	r24, r30
+ 5ea:	7b 2f       	mov	r23, r27
+ 5ec:	6a 2f       	mov	r22, r26
+ 5ee:	08 95       	ret
+
+000005f0 <__udivmodsi4>:
+ 5f0:	a1 e2       	ldi	r26, 0x21	; 33
+ 5f2:	1a 2e       	mov	r1, r26
+ 5f4:	aa 1b       	sub	r26, r26
+ 5f6:	bb 1b       	sub	r27, r27
+ 5f8:	ea 2f       	mov	r30, r26
+ 5fa:	fb 2f       	mov	r31, r27
+ 5fc:	0d c0       	rjmp	.+26     	; 0x618
+
+000005fe <__udivmodsi4_loop>:
+ 5fe:	aa 1f       	adc	r26, r26
+ 600:	bb 1f       	adc	r27, r27
+ 602:	ee 1f       	adc	r30, r30
+ 604:	ff 1f       	adc	r31, r31
+ 606:	a2 17       	cp	r26, r18
+ 608:	b3 07       	cpc	r27, r19
+ 60a:	e4 07       	cpc	r30, r20
+ 60c:	f5 07       	cpc	r31, r21
+ 60e:	20 f0       	brcs	.+8      	; 0x618
+ 610:	a2 1b       	sub	r26, r18
+ 612:	b3 0b       	sbc	r27, r19
+ 614:	e4 0b       	sbc	r30, r20
+ 616:	f5 0b       	sbc	r31, r21
+
+00000618 <__udivmodsi4_ep>:
+ 618:	66 1f       	adc	r22, r22
+ 61a:	77 1f       	adc	r23, r23
+ 61c:	88 1f       	adc	r24, r24
+ 61e:	99 1f       	adc	r25, r25
+ 620:	1a 94       	dec	r1
+ 622:	69 f7       	brne	.-38     	; 0x5fe
+ 624:	60 95       	com	r22
+ 626:	70 95       	com	r23
+ 628:	80 95       	com	r24
+ 62a:	90 95       	com	r25
+ 62c:	26 2f       	mov	r18, r22
+ 62e:	37 2f       	mov	r19, r23
+ 630:	48 2f       	mov	r20, r24
+ 632:	59 2f       	mov	r21, r25
+ 634:	6a 2f       	mov	r22, r26
+ 636:	7b 2f       	mov	r23, r27
+ 638:	8e 2f       	mov	r24, r30
+ 63a:	9f 2f       	mov	r25, r31
+ 63c:	08 95       	ret
+
+0000063e <__prologue_saves__>:
+ 63e:	2f 92       	push	r2
+ 640:	3f 92       	push	r3
+ 642:	4f 92       	push	r4
+ 644:	5f 92       	push	r5
+ 646:	6f 92       	push	r6
+ 648:	7f 92       	push	r7
+ 64a:	8f 92       	push	r8
+ 64c:	9f 92       	push	r9
+ 64e:	af 92       	push	r10
+ 650:	bf 92       	push	r11
+ 652:	cf 92       	push	r12
+ 654:	df 92       	push	r13
+ 656:	ef 92       	push	r14
+ 658:	ff 92       	push	r15
+ 65a:	0f 93       	push	r16
+ 65c:	1f 93       	push	r17
+ 65e:	cf 93       	push	r28
+ 660:	df 93       	push	r29
+ 662:	cd b7       	in	r28, 0x3d	; 61
+ 664:	de b7       	in	r29, 0x3e	; 62
+ 666:	ca 1b       	sub	r28, r26
+ 668:	db 0b       	sbc	r29, r27
+ 66a:	0f b6       	in	r0, 0x3f	; 63
+ 66c:	f8 94       	cli
+ 66e:	de bf       	out	0x3e, r29	; 62
+ 670:	0f be       	out	0x3f, r0	; 63
+ 672:	cd bf       	out	0x3d, r28	; 61
+ 674:	09 94       	ijmp
+
+00000676 <__epilogue_restores__>:
+ 676:	2a 88       	ldd	r2, Y+18	; 0x12
+ 678:	39 88       	ldd	r3, Y+17	; 0x11
+ 67a:	48 88       	ldd	r4, Y+16	; 0x10
+ 67c:	5f 84       	ldd	r5, Y+15	; 0x0f
+ 67e:	6e 84       	ldd	r6, Y+14	; 0x0e
+ 680:	7d 84       	ldd	r7, Y+13	; 0x0d
+ 682:	8c 84       	ldd	r8, Y+12	; 0x0c
+ 684:	9b 84       	ldd	r9, Y+11	; 0x0b
+ 686:	aa 84       	ldd	r10, Y+10	; 0x0a
+ 688:	b9 84       	ldd	r11, Y+9	; 0x09
+ 68a:	c8 84       	ldd	r12, Y+8	; 0x08
+ 68c:	df 80       	ldd	r13, Y+7	; 0x07
+ 68e:	ee 80       	ldd	r14, Y+6	; 0x06
+ 690:	fd 80       	ldd	r15, Y+5	; 0x05
+ 692:	0c 81       	ldd	r16, Y+4	; 0x04
+ 694:	1b 81       	ldd	r17, Y+3	; 0x03
+ 696:	aa 81       	ldd	r26, Y+2	; 0x02
+ 698:	b9 81       	ldd	r27, Y+1	; 0x01
+ 69a:	ce 0f       	add	r28, r30
+ 69c:	d1 1d       	adc	r29, r1
+ 69e:	0f b6       	in	r0, 0x3f	; 63
+ 6a0:	f8 94       	cli
+ 6a2:	de bf       	out	0x3e, r29	; 62
+ 6a4:	0f be       	out	0x3f, r0	; 63
+ 6a6:	cd bf       	out	0x3d, r28	; 61
+ 6a8:	ca 2f       	mov	r28, r26
+ 6aa:	db 2f       	mov	r29, r27
+ 6ac:	08 95       	ret
